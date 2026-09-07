@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: fitvibe-mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: fitvibe_db_password_2026
+      MYSQL_DATABASE: fitvibe
+    ports:
+      - "3306:3306"
+    volumes:
+      - fitvibe_mysql_data:/var/lib/mysql
+      - ./init_database_complete.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pfitvibe_db_password_2026"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+
+  backend:
+    build:
+      context: ./BE
+    container_name: fitvibe-backend
+    restart: unless-stopped
+    environment:
+      PORT: 5000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: fitvibe_db_password_2026
+      DB_NAME: fitvibe
+      JWT_SECRET: fitvibe_jwt_super_secret_key_2026
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./BE/uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./FitVibe
+    container_name: fitvibe-frontend
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      BACKEND_INTERNAL_URL: http://backend:5000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  fitvibe_mysql_data:

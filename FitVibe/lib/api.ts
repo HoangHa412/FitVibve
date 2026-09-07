@@ -5,7 +5,10 @@
 // Khi cần đổi base URL (ví dụ sang production), chỉ cần đổi API_BASE_URL.
 // =====================================================================
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL !== undefined 
+    ? process.env.NEXT_PUBLIC_API_URL 
+    : (typeof window !== 'undefined' ? '' : (process.env.BACKEND_INTERNAL_URL || 'http://backend:5000'));
+
 
 // ── Helper ──────────────────────────────────────────────────────────
 function getToken(): string | null {

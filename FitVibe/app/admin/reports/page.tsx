@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { API_BASE_URL } from '@/lib/api'
 import { 
   LineChart, 
   Line, 
@@ -69,7 +70,7 @@ export default function AdminReportsPage() {
           const token = localStorage.getItem('fitvibe-token')
           const headers = { Authorization: `Bearer ${token}` }
 
-          const res = await fetch('http://localhost:5000/api/admin/reports', { headers })
+          const res = await fetch(`${API_BASE_URL}/api/admin/reports`, { headers })
           if (res.ok) {
             setReportsData(await res.json())
           }

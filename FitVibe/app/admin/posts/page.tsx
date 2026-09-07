@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { API_BASE_URL } from '@/lib/api'
 
 interface Post {
   id: number;
@@ -37,12 +38,12 @@ export default function AdminPostsPage() {
           const token = localStorage.getItem('fitvibe-token')
           const headers = { Authorization: `Bearer ${token}` }
 
-          const postsRes = await fetch('http://localhost:5000/api/admin/pending-posts', { headers })
+          const postsRes = await fetch(`${API_BASE_URL}/api/admin/pending-posts`, { headers })
           if (postsRes.ok) {
             setPosts(await postsRes.json())
           }
 
-          const statsRes = await fetch('http://localhost:5000/api/admin/stats', { headers })
+          const statsRes = await fetch(`${API_BASE_URL}/api/admin/stats`, { headers })
           if (statsRes.ok) {
             setStats(await statsRes.json())
           }
@@ -73,7 +74,7 @@ export default function AdminPostsPage() {
   const handleApprove = async (id: number) => {
     try {
       const token = localStorage.getItem('fitvibe-token')
-      const res = await fetch(`http://localhost:5000/api/admin/posts/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/posts/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ export default function AdminPostsPage() {
   const handleReject = async (id: number) => {
     try {
       const token = localStorage.getItem('fitvibe-token')
-      const res = await fetch(`http://localhost:5000/api/admin/posts/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/posts/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

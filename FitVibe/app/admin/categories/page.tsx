@@ -14,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { API_BASE_URL } from '@/lib/api'
 
 interface Category {
     id: number;
@@ -41,7 +42,7 @@ export default function AdminCategoriesPage() {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/categories')
+            const res = await fetch(`${API_BASE_URL}/api/categories`)
             if (res.ok) {
                 setCategories(await res.json())
             }
@@ -85,7 +86,7 @@ export default function AdminCategoriesPage() {
         try {
             if (isEditing && editId) {
                 // Update
-                const res = await fetch(`http://localhost:5000/api/admin/categories/${editId}`, {
+                const res = await fetch(`${API_BASE_URL}/api/admin/categories/${editId}`, {
                     method: 'PUT',
                     headers,
                     body
@@ -96,7 +97,7 @@ export default function AdminCategoriesPage() {
                 }
             } else {
                 // Create
-                const res = await fetch('http://localhost:5000/api/admin/categories', {
+                const res = await fetch(`${API_BASE_URL}/api/admin/categories`, {
                     method: 'POST',
                     headers,
                     body
@@ -123,7 +124,7 @@ export default function AdminCategoriesPage() {
         if (!confirm('Bạn có chắc muốn xóa danh mục này không?')) return
         try {
             const token = localStorage.getItem('fitvibe-token')
-            const res = await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/api/admin/categories/${id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
             })

@@ -7,6 +7,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { API_BASE_URL } from '@/lib/api'
 
 interface Member {
   id: number;
@@ -38,7 +39,7 @@ export default function AdminMembersPage() {
           const token = localStorage.getItem('fitvibe-token')
           const headers = { Authorization: `Bearer ${token}` }
 
-          const res = await fetch('http://localhost:5000/api/admin/users', { headers })
+          const res = await fetch(`${API_BASE_URL}/api/admin/users`, { headers })
           if (res.ok) {
             setMembers(await res.json())
           }
@@ -87,7 +88,7 @@ export default function AdminMembersPage() {
   const handleUpdateStatus = async (id: number, newStatus: string) => {
     try {
       const token = localStorage.getItem('fitvibe-token')
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -214,7 +215,7 @@ export default function AdminMembersPage() {
                             if (!confirm('Bạn có chắc muốn reset mật khẩu thành viên này về mặc đinh (trùng với email)?')) return;
                             try {
                               const token = localStorage.getItem('fitvibe-token');
-                              const res = await fetch(`http://localhost:5000/api/admin/users/${member.id}/reset-password`, {
+                              const res = await fetch(`${API_BASE_URL}/api/admin/users/${member.id}/reset-password`, {
                                 method: 'PUT',
                                 headers: { Authorization: `Bearer ${token}` }
                               });
@@ -232,7 +233,7 @@ export default function AdminMembersPage() {
                           <button onClick={async () => {
                             if (!confirm('Bạn có chắc muốn xóa thành viên này không?')) return;
                             const token = localStorage.getItem('fitvibe-token');
-                            const res = await fetch(`http://localhost:5000/api/admin/users/${member.id}`, {
+                            const res = await fetch(`${API_BASE_URL}/api/admin/users/${member.id}`, {
                               method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
                             });
                             if (res.ok) setMembers((prev: Member[]) => prev.filter((m) => m.id !== member.id));

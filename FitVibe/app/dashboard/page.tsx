@@ -128,40 +128,67 @@ export default function UserDashboard() {
   const healthStats = data?.healthStats || {}
   const profile = data?.user || {}
 
+  // Determine time of day greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return 'Chào buổi sáng ☀️'
+    if (hour < 18) return 'Chào buổi chiều 🌤️'
+    return 'Chào buổi tối 🌙'
+  }
+
+  // Calculate BMI bar percentage (Range: 15 to 35 for visual representation)
+  const bmiValue = healthStats.bmi || 22
+  const bmiPercent = Math.min(Math.max(((bmiValue - 15) / (35 - 15)) * 100, 2), 98)
+
   return (
     <DashboardLayout navItems={navItems}>
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Top Header & Wallet */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">Chào mừng, {user.name}!</h2>
-            <p className="text-muted-foreground">Xem tổng quan sức khỏe của bạn</p>
+            <span className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-1.5 mb-1">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              Tổng quan sức khỏe cá nhân
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+              {getGreeting()}, <span className="text-gradient">{user.name}</span>!
+            </h2>
+            <p className="text-muted-foreground text-sm mt-1">
+              Mục tiêu hiện tại:{' '}
+              <span className="font-bold text-foreground">
+                {profile.goal === 'weight_loss' ? '🔥 Giảm mỡ / Giảm cân' :
+                 profile.goal === 'muscle_gain' ? '💪 Tăng cơ / Phát triển vóc dáng' :
+                 profile.goal === 'general_fitness' ? '⚡ Thể lực & Sức bền dẻo dai' : '🌱 Duy trì lối sống khỏe mạnh'}
+              </span>
+            </p>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <Card className="p-4 bg-gradient-to-r from-accent/10 to-primary/10 border-border flex items-center gap-6 min-w-[250px]">
-              <div className="flex-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50">Số dư hiện tại</p>
+
+          <div className="flex items-center gap-3">
+            <Card className="p-4 rounded-2xl bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-transparent border-primary/20 flex items-center gap-4 shadow-sm">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-70">Số dư ví</p>
                 <p className="text-2xl font-black text-primary">
                   {isLoading ? '...' : Math.floor(profile.balance || 0).toLocaleString('vi-VN')}đ
                 </p>
               </div>
-              <Button size="sm" className="rounded-xl font-bold" onClick={() => setIsTopUpOpen(true)}>
+              <Button size="sm" className="rounded-xl font-bold btn-premium shadow-md" onClick={() => setIsTopUpOpen(true)}>
                 + Nạp tiền
               </Button>
             </Card>
 
             <Dialog open={isTopUpOpen} onOpenChange={setIsTopUpOpen}>
-              <DialogContent className="max-w-md bg-card border-border rounded-[2rem]">
+              <DialogContent className="max-w-md bg-card border-border rounded-[2.5rem] p-8">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-black">Nạp tiền vào ví 💳</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-6 py-6">
+                <div className="space-y-6 py-4">
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-wider opacity-50">Số tiền muốn nạp (VND)</Label>
+                    <Label className="text-xs font-bold uppercase tracking-wider opacity-60">Số tiền muốn nạp (VND)</Label>
                     <Input 
                       type="number" 
                       value={topUpAmount} 
                       onChange={e => setTopUpAmount(e.target.value)}
-                      className="text-2xl font-black h-16 rounded-2xl bg-secondary/30 border-none focus:ring-2 ring-primary/20 text-center"
+                      className="text-2xl font-black h-16 rounded-2xl bg-secondary/40 border-none focus:ring-2 ring-primary/20 text-center"
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-2">
@@ -170,19 +197,19 @@ export default function UserDashboard() {
                         key={amt} 
                         variant="outline" 
                         size="sm"
-                        className={`rounded-xl text-[10px] font-bold ${topUpAmount === amt ? 'bg-primary text-primary-foreground border-primary' : ''}`}
+                        className={`rounded-xl text-xs font-bold transition-all ${topUpAmount === amt ? 'bg-primary text-primary-foreground border-primary shadow-sm' : ''}`}
                         onClick={() => setTopUpAmount(amt)}
                       >
-                        {parseInt(amt).toLocaleString()}
+                        {parseInt(amt).toLocaleString()}đ
                       </Button>
                     ))}
                   </div>
-                  <p className="text-[10px] text-center text-muted-foreground italic">
-                    * Bạn sẽ được chuyển hướng sang cổng thanh toán VNPay Sandbox để hoàn tất giao dịch.
+                  <p className="text-xs text-center text-muted-foreground italic">
+                    * Bạn sẽ được chuyển hướng sang cổng thanh toán VNPay Sandbox để hoàn tất giao dịch an toàn.
                   </p>
                 </div>
                 <DialogFooter>
-                  <Button onClick={handleTopUp} className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20">
+                  <Button onClick={handleTopUp} className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest btn-premium shadow-xl shadow-primary/20">
                     Xác nhận nạp tiền
                   </Button>
                 </DialogFooter>
@@ -191,89 +218,160 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Quick Action Shortcuts */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
           {[
-            { label: 'BMI', value: isLoading ? '...' : healthStats.bmi?.toFixed(1) || '--', status: healthStats.category || 'Nhập chỉ số' },
-            { label: 'Cân nặng', value: isLoading ? '...' : (profile.weight || '--') + ' kg', status: 
-              profile.goal === 'weight_loss' ? 'Mục tiêu: Giảm cân' : 
-              profile.goal === 'muscle_gain' ? 'Mục tiêu: Tăng cơ' : 
-              profile.goal === 'maintenance' ? 'Mục tiêu: Duy trì' : 
-              profile.goal === 'general_fitness' ? 'Sức khỏe tổng quát' : 'Duy trì' 
-            },
-            { label: 'BMR', value: isLoading ? '...' : (healthStats.bmr?.toFixed(0) || '--') + ' cal', status: 'Năng lượng nghỉ' },
-            { label: 'TDEE', value: isLoading ? '...' : (healthStats.tdee?.toFixed(0) || '--') + ' cal', status: 'Năng lượng ngày' },
-          ].map((stat, idx) => (
-            <Card key={idx} className="p-6 rounded-2xl bg-gradient-to-br from-card to-secondary/5 border-border">
-              <p className="text-sm text-muted-foreground mb-2">{stat.label}</p>
-              <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-xs text-accent mt-2">{stat.status}</p>
-            </Card>
+            { icon: '⚖️', label: 'Ghi cân nặng', href: '/dashboard/weight', bg: 'hover:border-amber-500/40' },
+            { icon: '🏋️', label: 'Bài tập hôm nay', href: '/dashboard/workouts', bg: 'hover:border-primary/40' },
+            { icon: '🥦', label: 'Thực đơn dinh dưỡng', href: '/dashboard/meals', bg: 'hover:border-emerald-500/40' },
+            { icon: '👨‍🏫', label: 'Đội ngũ HLV', href: '/dashboard/coaches', bg: 'hover:border-teal-500/40' },
+          ].map((action, idx) => (
+            <button
+              key={idx}
+              onClick={() => router.push(action.href)}
+              className={`p-4 rounded-2xl bg-card border border-border/70 ${action.bg} hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 text-left shadow-sm group`}
+            >
+              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                {action.icon}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">{action.label}</p>
+                <p className="text-[10px] text-muted-foreground">Truy cập nhanh →</p>
+              </div>
+            </button>
           ))}
         </div>
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Activities */}
-          <Card className="p-6 rounded-2xl bg-card border-border">
-            <h3 className="text-lg font-bold text-foreground mb-4">Hoạt động gần đây</h3>
-            <div className="space-y-3">
-              {profile.weight ? (
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/20">
-                  <div className="w-2 h-2 rounded-full bg-accent"></div>
-                  <p className="text-sm text-foreground">Ghi nhận cân nặng mới nhất: {profile.weight} kg</p>
+        {/* Health Stats Grid with BMI Bar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* BMI Gauge Card */}
+          <Card className="p-6 rounded-3xl bg-card border-border shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Chỉ số BMI</span>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                  healthStats.category?.includes('Bình thường') ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' :
+                  healthStats.category?.includes('Gầy') ? 'bg-blue-500/15 text-blue-600' :
+                  'bg-orange-500/15 text-orange-600'
+                }`}>
+                  {healthStats.category || 'Chưa có'}
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="text-4xl font-black text-foreground">
+                  {isLoading ? '...' : healthStats.bmi?.toFixed(1) || '--'}
+                </span>
+                <span className="text-xs text-muted-foreground">kg/m²</span>
+              </div>
+
+              {/* Spectrum Bar */}
+              <div className="space-y-1.5">
+                <div className="relative h-3 rounded-full overflow-hidden flex bg-secondary">
+                  <div className="w-[17.5%] bg-blue-400" title="Gầy (<18.5)" />
+                  <div className="w-[32.5%] bg-emerald-400" title="Bình thường (18.5-24.9)" />
+                  <div className="w-[25%] bg-amber-400" title="Thừa cân (25-29.9)" />
+                  <div className="w-[25%] bg-rose-500" title="Béo phì (≥30)" />
+                  {healthStats.bmi && (
+                    <div
+                      className="absolute top-0 bottom-0 w-1.5 bg-foreground rounded-full shadow-lg transition-all duration-700"
+                      style={{ left: `${bmiPercent}%` }}
+                    />
+                  )}
                 </div>
-              ) : null}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/20">
-                <div className="w-2 h-2 rounded-full bg-accent"></div>
-                <p className="text-sm text-foreground">Bắt đầu hành trình FitVibe của bạn</p>
+                <div className="flex justify-between text-[9px] text-muted-foreground font-semibold px-0.5">
+                  <span>Gầy</span>
+                  <span>Chuẩn</span>
+                  <span>Thừa cân</span>
+                  <span>Béo phì</span>
+                </div>
               </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground flex justify-between items-center">
+              <span>Chiều cao: <strong className="text-foreground">{profile.height || '--'} cm</strong></span>
+              <span>Cân nặng: <strong className="text-foreground">{profile.weight || '--'} kg</strong></span>
             </div>
           </Card>
 
-          {/* Tips */}
-          <Card className="p-6 rounded-2xl bg-card border-border">
-            <h3 className="text-lg font-bold text-foreground mb-4">Lời khuyên cho bạn</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
-                <span className="text-lg">💡</span>
-                <p className="text-sm text-foreground">
-                  {profile.goal === 'weight_loss'
-                    ? 'Hãy tập trung vào Cardio và thâm hụt Calo.'
-                    : profile.goal === 'muscle_gain'
-                      ? 'Bổ sung Protein và tập nâng tạ nặng hơn.'
-                      : profile.goal === 'maintenance'
-                        ? 'Duy trì lối sống năng động và ăn uống cân bằng.'
-                        : 'Luyện tập đều đặn để cải thiện sức khỏe tổng thể.'}
-                </p>
+          {/* Calorie & Energy Card */}
+          <Card className="p-6 rounded-3xl bg-card border-border shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Calo Mục Tiêu</span>
+                <span className="text-xs font-bold text-primary">Mỗi ngày</span>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
-                <span className="text-lg">💧</span>
-                <p className="text-sm text-foreground">Đừng quên uống đủ 2L nước mỗi ngày.</p>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="text-4xl font-black text-primary">
+                  {isLoading ? '...' : healthStats.targetCalories?.toFixed(0) || healthStats.tdee?.toFixed(0) || '--'}
+                </span>
+                <span className="text-xs text-muted-foreground">kcal / ngày</span>
               </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">BMR (Chuyển hóa cơ bản):</span>
+                  <strong className="text-foreground">{healthStats.bmr?.toFixed(0) || '--'} kcal</strong>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">TDEE (Năng lượng tiêu hao):</span>
+                  <strong className="text-foreground">{healthStats.tdee?.toFixed(0) || '--'} kcal</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-border/50 text-[11px] text-muted-foreground flex items-center gap-2">
+              <span>💡</span>
+              <span className="truncate">
+                {profile.goal === 'weight_loss' ? 'Đã trừ ~300-500 kcal tạo thâm hụt mỡ' :
+                 profile.goal === 'muscle_gain' ? 'Đã cộng ~300 kcal để nuôi cơ bắp' : 'Mức năng lượng giữ cân ổn định'}
+              </span>
             </div>
           </Card>
 
-          {/* New Section: Register with Coach */}
-          <Card className="p-6 rounded-2xl bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20 md:col-span-2">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2">
-                  <span>🏆</span> Tìm kiếm Huấn luyện viên cá nhân?
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Đăng ký tập luyện cùng đội ngũ huấn luyện viên chuyên nghiệp để có lộ trình riêng biệt và hiệu quả nhất cho bản thân bạn.
-                </p>
+          {/* Hydration & Daily Advice Card */}
+          <Card className="p-6 rounded-3xl bg-gradient-to-br from-primary/10 via-teal-500/5 to-transparent border-primary/20 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Lời khuyên hôm nay</span>
+                <span className="text-xl">💧</span>
               </div>
-              <Button
-                onClick={() => router.push('/dashboard/coaches')}
-                className="rounded-full px-8 py-6 font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-              >
-                Khám phá ngay
+              <h4 className="font-bold text-foreground text-sm mb-2">Uống đủ nước & Giữ nhịp độ</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Với cân nặng {profile.weight || 60}kg, cơ thể cần tối thiểu <strong className="text-primary">{((profile.weight || 60) * 0.04).toFixed(1)}L nước/ngày</strong> để trao đổi chất và phục hồi cơ hiệu quả.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
+              <span className="text-xs text-muted-foreground font-medium">Cần tư vấn thêm?</span>
+              <Button size="sm" variant="ghost" onClick={handleGenerateRec} className="text-xs font-bold text-primary hover:text-primary">
+                Hỏi AI ngay →
               </Button>
             </div>
           </Card>
         </div>
+
+        {/* Coach Promotion Card */}
+        <Card className="p-8 rounded-[2rem] bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border-primary/20 shadow-sm">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex-1 space-y-2 text-center md:text-left">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 text-primary text-[10px] font-black uppercase tracking-wider">
+                <span>🏆</span> Huấn luyện viên 1-Kèm-1
+              </div>
+              <h3 className="text-2xl font-black text-foreground">
+                Muốn đạt mục tiêu nhanh hơn gấp 2 lần?
+              </h3>
+              <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed max-w-2xl">
+                Tham gia cùng các Huấn luyện viên thể hình hàng đầu được chứng nhận NASM / ACSM. Được thiết kế lộ trình riêng, theo dõi bài tập và sửa kỹ thuật trực tiếp.
+              </p>
+            </div>
+            <Button
+              onClick={() => router.push('/dashboard/coaches')}
+              className="rounded-2xl px-8 py-6 font-black text-sm uppercase tracking-wider btn-premium shadow-xl shadow-primary/20 shrink-0"
+            >
+              Xem đội ngũ HLV →
+            </Button>
+          </div>
+        </Card>
 
         {/* Smart Recommendations Section */}
         <div className="mt-12 mb-8">

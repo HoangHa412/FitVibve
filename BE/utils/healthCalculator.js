@@ -3,7 +3,7 @@ const calculateBMI = (weight, heightCm) => {
     const bmi = weight / (heightM * heightM);
     let category = '';
 
-    if (bmi < 18.5) category = 'Thếu cân (Gầy)';
+    if (bmi < 18.5) category = 'Thiếu cân (Gầy)';
     else if (bmi >= 18.5 && bmi <= 24.9) category = 'Bình thường';
     else if (bmi >= 25 && bmi <= 29.9) category = 'Thừa cân';
     else category = 'Béo phì';

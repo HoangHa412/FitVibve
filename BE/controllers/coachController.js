@@ -252,21 +252,16 @@ const getCoachStats = async (req, res) => {
         const clientQuery = `
             SELECT COUNT(DISTINCT user_id) as total
             FROM (
-                SELECT user_id FROM user_route_progress urp
-                JOIN route_stages rs ON urp.route_stage_id = rs.id
-                JOIN routes r ON rs.route_id = r.id
-                WHERE r.coach_id = ?
+                SELECT s.user_id FROM route_submissions s JOIN route_stages rs ON s.route_stage_id = rs.id JOIN routes r ON rs.route_id = r.id WHERE r.coach_id = ?
                 UNION
                 SELECT user_id FROM enrollments WHERE coach_id = ? AND status = 'active'
                 UNION
                 SELECT pur.user_id FROM purchases pur JOIN routes r ON pur.content_id = r.id WHERE pur.content_type = 'route' AND r.coach_id = ?
                 UNION
                 SELECT pur.user_id FROM purchases pur JOIN posts p ON pur.content_id = p.id WHERE pur.content_type = 'post' AND p.coach_id = ?
-                UNION
-                SELECT s.user_id FROM route_submissions s JOIN route_stages rs ON s.route_stage_id = rs.id JOIN routes r ON rs.route_id = r.id WHERE r.coach_id = ?
             ) combined_clients
         `;
-        const [clientsCount] = await pool.query(clientQuery, [coach_id, coach_id, coach_id, coach_id, coach_id]);
+        const [clientsCount] = await pool.query(clientQuery, [coach_id, coach_id, coach_id, coach_id]);
 
         // Get coach balance
         const [coachInfo] = await pool.query('SELECT balance FROM users WHERE id = ?', [coach_id]);
@@ -292,10 +287,10 @@ const getCoachClients = async (req, res) => {
             FROM users u
             LEFT JOIN profiles p ON u.id = p.user_id
             WHERE u.id IN (
-                -- 1. Students with progress in coach's routes
-                SELECT user_id FROM user_route_progress urp
-                JOIN route_stages rs ON urp.route_stage_id = rs.id
-                JOIN routes r ON rs.route_id = r.id
+                -- 1. Students who have submitted assignments in coach's routes
+                SELECT s.user_id FROM route_submissions s 
+                JOIN route_stages rs ON s.route_stage_id = rs.id 
+                JOIN routes r ON rs.route_id = r.id 
                 WHERE r.coach_id = ?
                 UNION
                 -- 2. Students who explicitly enrolled with the coach
@@ -310,15 +305,9 @@ const getCoachClients = async (req, res) => {
                 SELECT pur.user_id FROM purchases pur
                 JOIN posts p ON pur.content_id = p.id
                 WHERE pur.content_type = 'post' AND p.coach_id = ?
-                UNION
-                -- 5. Students who have submitted assignments
-                SELECT s.user_id FROM route_submissions s 
-                JOIN route_stages rs ON s.route_stage_id = rs.id 
-                JOIN routes r ON rs.route_id = r.id 
-                WHERE r.coach_id = ?
             )
         `;
-        const [clients] = await pool.query(query, [coach_id, coach_id, coach_id, coach_id, coach_id]);
+        const [clients] = await pool.query(query, [coach_id, coach_id, coach_id, coach_id]);
         res.json(clients);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });

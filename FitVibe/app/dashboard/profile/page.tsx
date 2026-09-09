@@ -285,9 +285,10 @@ export default function ProfilePage() {
                                             value={goal}
                                             onChange={(e) => setGoal(e.target.value)}
                                         >
-                                            <option value="maintain">Duy trì vóc dáng</option>
-                                            <option value="weight_loss">Giảm cân</option>
-                                            <option value="muscle_gain">Tăng cơ</option>
+                                            <option value="weight_loss">Giảm cân (Weight Loss)</option>
+                                            <option value="muscle_gain">Tăng cơ (Muscle Gain)</option>
+                                            <option value="maintenance">Duy trì (Maintenance)</option>
+                                            <option value="general_fitness">Sức khỏe tổng quát (General Fitness)</option>
                                         </select>
                                     </div>
                                 </div>

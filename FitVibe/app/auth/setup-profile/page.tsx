@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import { userApi } from '@/lib/api'
+import { toast } from 'sonner'
 
 export default function SetupProfile() {
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
   const router = useRouter()
   const [role, setRole] = useState<'user' | 'coach'>('user')
   const [height, setHeight] = useState('')
@@ -25,21 +27,23 @@ export default function SetupProfile() {
     e.preventDefault()
     setLoading(true)
 
-    // TODO: Save profile to database
-    const profileData = {
-      role,
-      height: parseFloat(height),
-      weight: parseFloat(weight),
-      age: parseInt(age),
-    }
-
-    console.log('Profile setup:', profileData)
-
-    // Redirect based on role
-    setTimeout(() => {
+    try {
+      if (role === 'user') {
+        await userApi.updateProfile({
+          height: height ? parseFloat(height) : null,
+          weight: weight ? parseFloat(weight) : null,
+          age: age ? parseInt(age) : null,
+        })
+      }
+      await refreshUser()
+      toast.success('Thiết lập hồ sơ thành công!')
       const destination = role === 'coach' ? '/coach' : '/dashboard'
       router.push(destination)
-    }, 500)
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi lưu hồ sơ')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

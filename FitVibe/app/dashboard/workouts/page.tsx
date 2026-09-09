@@ -73,8 +73,8 @@ export default function WorkoutsPage() {
       toast.success('Đã mở khóa nội dung!')
       fetchWorkouts()
       setIsDetailOpen(false)
-    } catch (error) {
-      toast.error('Mở khóa thất bại')
+    } catch (error: any) {
+      toast.error(error?.message || 'Mở khóa thất bại')
     }
   }
 

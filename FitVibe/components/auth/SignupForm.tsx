@@ -45,9 +45,9 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         formData.append('role', 'coach')
         
         if (certificateFiles) {
-          Array.from(certificateFiles).forEach(file => {
-            formData.append('certificates', file)
-          })
+          Array.from(certificateFiles).forEach((file: any) => {
+            formData.append('certificates', file);
+          });
         }
         
         await signup(formData)
@@ -59,8 +59,8 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
       if (onSuccess) {
         onSuccess()
       }
-    } catch (err) {
-      setError('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.')
+    } catch (err: any) {
+      setError(err?.message || 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.')
     } finally {
       setLoading(false)
     }

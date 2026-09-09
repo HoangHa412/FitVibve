@@ -10,7 +10,8 @@ import {
   Loader2, 
   Minimize2, 
   Maximize2,
-  Dumbbell
+  Sparkles,
+  RotateCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { aiApi } from '@/lib/api';
@@ -21,6 +22,13 @@ interface Message {
   content: string;
   timestamp: Date;
 }
+
+const QUICK_PROMPTS = [
+  '🥗 Gợi ý thực đơn Eat Clean',
+  '💪 Lịch tập tăng cơ 4 buổi/tuần',
+  '💧 Cách tính lượng nước cần uống',
+  '🔥 Bài tập Cardio đốt mỡ nhanh',
+];
 
 export default function AIChatBubble() {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,13 +45,12 @@ export default function AIChatBubble() {
     }
   }, [messages, isOpen]);
 
-  const handleSend = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (textToSend: string) => {
+    if (!textToSend.trim() || isLoading) return;
 
     const userMessage: Message = {
       role: 'user',
-      content: input.trim(),
+      content: textToSend.trim(),
       timestamp: new Date(),
     };
 
@@ -52,7 +59,6 @@ export default function AIChatBubble() {
     setIsLoading(true);
 
     try {
-      // Prepare history for API (excluding the current user message which is separate)
       const history = messages.map(msg => ({
         role: msg.role,
         content: msg.content
@@ -80,16 +86,28 @@ export default function AIChatBubble() {
     }
   };
 
+  const handleSend = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    sendMessage(input);
+  };
+
+  const handleClearChat = () => {
+    setMessages([]);
+    toast.success('Đã làm mới cuộc hội thoại');
+  };
+
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 z-50 group overflow-hidden"
-        title="Chat với AI FitVibe"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-full shadow-xl shadow-emerald-500/30 flex items-center justify-center transition-all hover:scale-110 active:scale-95 z-50 group glow-pulse border border-white/30"
+        title="Trợ lý AI FitVibe 24/7"
       >
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <MessageSquare className="w-6 h-6 z-10" />
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-white rounded-full animate-pulse" />
+        <div className="relative">
+          <MessageSquare className="w-6 h-6 group-hover:scale-110 transition-transform" />
+          <Sparkles className="w-3.5 h-3.5 text-yellow-300 absolute -top-1.5 -right-2 animate-bounce" />
+        </div>
+        <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 border-2 border-white rounded-full" />
       </button>
     );
   }
@@ -98,34 +116,48 @@ export default function AIChatBubble() {
     <div 
       className={cn(
         "fixed bottom-6 right-6 z-50 flex flex-col shadow-2xl transition-all duration-300 transform origin-bottom-right",
-        isMinimized ? "w-72 h-14" : "w-80 md:w-96 h-[500px]",
-        "border border-white/20 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900"
+        isMinimized ? "w-80 h-14" : "w-80 sm:w-96 h-[540px]",
+        "border border-border/80 rounded-[2rem] overflow-hidden bg-card backdrop-blur-xl"
       )}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex items-center justify-between text-white shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-            <Dumbbell className="w-5 h-5" />
+      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-4 flex items-center justify-between text-white shrink-0 shadow-md">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-inner">
+            <Bot className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-sm tracking-tight">AI Coach FitVibe</h3>
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-[10px] opacity-80 uppercase font-semibold">Online</span>
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-bold text-sm tracking-tight">Trợ Lý AI FitVibe</h3>
+              <span className="px-1.5 py-0.5 rounded bg-white/20 text-[9px] font-black uppercase tracking-wider">v2.5</span>
+            </div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="w-2 h-2 bg-emerald-300 rounded-full animate-pulse" />
+              <span className="text-[10px] text-emerald-100 font-medium">Sẵn sàng 24/7</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-1">
+          {messages.length > 0 && !isMinimized && (
+            <button 
+              onClick={handleClearChat}
+              className="p-1.5 hover:bg-white/15 rounded-lg transition-colors text-white/80 hover:text-white"
+              title="Xóa đoạn chat"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          )}
           <button 
             onClick={() => setIsMinimized(!isMinimized)}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-white/15 rounded-lg transition-colors text-white/80 hover:text-white"
+            title={isMinimized ? 'Phóng to' : 'Thu nhỏ'}
           >
             {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
           </button>
           <button 
             onClick={() => setIsOpen(false)}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-white/15 rounded-lg transition-colors text-white/80 hover:text-white"
+            title="Đóng chat"
           >
             <X className="w-4 h-4" />
           </button>
@@ -135,13 +167,33 @@ export default function AIChatBubble() {
       {!isMinimized && (
         <>
           {/* Chat area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-zinc-950/50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-secondary/15">
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-60">
-                <Bot className="w-12 h-12 text-blue-500" />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Xin chào! Tôi là trợ lý AI FitVibe.</p>
-                  <p className="text-xs">Tôi có thể giúp bạn lên lịch tập, tư vấn dinh dưỡng hoặc giải đáp các thắc mắc về sức khỏe.</p>
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-4 px-2 py-6">
+                <div className="w-16 h-16 rounded-2xl bg-primary/15 border border-primary/20 flex items-center justify-center">
+                  <Sparkles className="w-8 h-8 text-primary" />
+                </div>
+                <div className="space-y-1 max-w-xs">
+                  <p className="text-sm font-bold text-foreground">Xin chào! Tôi có thể giúp gì cho bạn?</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Hỏi tôi bất cứ điều gì về chế độ dinh dưỡng, kỹ thuật bài tập, hoặc tính toán calo cá nhân.
+                  </p>
+                </div>
+
+                {/* Quick Prompts */}
+                <div className="w-full space-y-1.5 pt-2">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider text-left">Gợi ý câu hỏi:</p>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {QUICK_PROMPTS.map((prompt, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => sendMessage(prompt)}
+                        className="text-left p-2.5 rounded-xl bg-card hover:bg-primary/10 border border-border/70 hover:border-primary/30 text-xs text-foreground transition-all duration-200 shadow-sm"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -150,36 +202,37 @@ export default function AIChatBubble() {
               <div
                 key={i}
                 className={cn(
-                  "flex items-end gap-2",
+                  "flex items-end gap-2 animate-in",
                   msg.role === 'user' ? "flex-row-reverse" : "flex-row"
                 )}
               >
                 <div className={cn(
-                  "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mb-1",
-                  msg.role === 'user' ? "bg-indigo-100 text-indigo-600" : "bg-blue-100 text-blue-600"
+                  "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-1 shadow-sm",
+                  msg.role === 'user' ? "bg-primary text-primary-foreground" : "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                 )}>
-                  {msg.role === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
+                  {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                 </div>
                 <div
                   className={cn(
-                    "max-w-[80%] p-3 rounded-2xl text-sm shadow-sm",
+                    "max-w-[82%] p-3.5 rounded-2xl text-xs sm:text-sm shadow-sm leading-relaxed",
                     msg.role === 'user'
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : "bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 rounded-bl-none border border-zinc-200 dark:border-zinc-700"
+                      ? "bg-primary text-primary-foreground rounded-br-none font-medium"
+                      : "bg-card text-foreground rounded-bl-none border border-border/70"
                   )}
                 >
-                  <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>
               </div>
             ))}
             
             {isLoading && (
-              <div className="flex items-end gap-2">
-                <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mb-1">
-                  <Bot className="w-3.5 h-3.5" />
+              <div className="flex items-end gap-2 animate-in">
+                <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-600 flex items-center justify-center shrink-0 mb-1">
+                  <Bot className="w-4 h-4" />
                 </div>
-                <div className="bg-white dark:bg-zinc-800 p-3 rounded-2xl rounded-bl-none border border-zinc-200 dark:border-zinc-700 shadow-sm">
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                <div className="bg-card p-3.5 rounded-2xl rounded-bl-none border border-border/70 shadow-sm flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  <span className="text-xs text-muted-foreground font-medium">AI đang suy nghĩ...</span>
                 </div>
               </div>
             )}
@@ -189,20 +242,20 @@ export default function AIChatBubble() {
           {/* Input */}
           <form 
             onSubmit={handleSend}
-            className="p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 flex gap-2"
+            className="p-3 bg-card border-t border-border flex items-center gap-2"
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Nhập câu hỏi..."
+              placeholder="Hỏi AI về dinh dưỡng, bài tập..."
               disabled={isLoading}
-              className="flex-1 bg-zinc-100 dark:bg-zinc-800 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+              className="flex-1 bg-secondary/50 border border-border/60 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none text-foreground placeholder:text-muted-foreground"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="w-10 h-10 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 text-white rounded-xl flex items-center justify-center transition-colors shadow-md active:scale-95"
+              className="w-10 h-10 bg-primary hover:bg-primary/90 disabled:opacity-40 text-primary-foreground rounded-xl flex items-center justify-center transition-all shadow-md active:scale-95 shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>

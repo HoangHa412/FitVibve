@@ -46,8 +46,8 @@ export default function RoutesPage() {
             await userApi.purchaseContent(id, 'route', price)
             toast.success('Đã mở khóa lộ trình!')
             fetchRoutes()
-        } catch (error) {
-            toast.error('Mở khóa thất bại')
+        } catch (error: any) {
+            toast.error(error?.message || 'Mở khóa thất bại')
         }
     }
 

@@ -35,7 +35,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="text-sm font-medium text-foreground block mb-2">Email</label>
+        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-1.5">Email</label>
         <Input
           type="email"
           placeholder="you@example.com"
@@ -43,11 +43,12 @@ export default function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={loading}
+          className="h-11 rounded-xl bg-secondary/30"
         />
       </div>
 
       <div>
-        <label className="text-sm font-medium text-foreground block mb-2">Mật khẩu</label>
+        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-1.5">Mật khẩu</label>
         <Input
           type="password"
           placeholder="••••••••"
@@ -55,17 +56,22 @@ export default function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           disabled={loading}
+          className="h-11 rounded-xl bg-secondary/30"
         />
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && (
+        <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs font-semibold text-destructive flex items-center gap-2">
+          <span>⚠️</span> {error}
+        </div>
+      )}
 
       <Button
         type="submit"
-        className="w-full"
+        className="w-full h-12 rounded-xl font-black text-sm uppercase tracking-wider btn-premium shadow-lg shadow-primary/20"
         disabled={loading}
       >
-        {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+        {loading ? 'Đang xác thực...' : 'Đăng nhập ngay →'}
       </Button>
     </form>
   )

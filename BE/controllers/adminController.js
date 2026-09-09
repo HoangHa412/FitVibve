@@ -186,7 +186,7 @@ const getReportsData = async (req, res) => {
             FROM users u
             JOIN posts p ON u.id = p.coach_id
             WHERE u.role = 'coach' AND p.status = 'approved'
-            GROUP BY u.id
+            GROUP BY u.id, u.full_name
             ORDER BY post_count DESC
             LIMIT 3
         `);
@@ -209,10 +209,10 @@ const getReportsData = async (req, res) => {
             ORDER BY DATE(created_at) ASC
         `);
 
-        // 7. Plan Completion Distribution
+        // 7. Plan Completion Distribution (From route_submissions)
         const [planCompletion] = await pool.query(`
             SELECT status, COUNT(*) as count
-            FROM user_route_progress
+            FROM route_submissions
             GROUP BY status
         `);
 

@@ -158,23 +158,23 @@ export default function WorkoutsPage() {
           {!isLoading && posts.length > 0 ? posts.map((post, idx) => (
             <div
               key={post.id}
-              className="group relative cursor-pointer animate-in"
+              className="group relative cursor-pointer animate-fade-in-up"
               style={{ animationDelay: `${idx * 0.05}s` }}
               onClick={() => handlePostClick(post)}
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <Card className="relative overflow-hidden p-0 border-border/50 bg-card hover:border-primary/30 transition-all duration-500 rounded-[2.5rem] flex flex-col h-full shadow-sm hover:shadow-2xl hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-teal-500/10 to-accent/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="relative overflow-hidden p-0 border-border/50 bg-card hover:border-primary/40 transition-all duration-300 rounded-[2.5rem] flex flex-col h-full shadow-sm hover:shadow-2xl hover:-translate-y-2">
                 <div className="p-8 pb-0">
                   <div className="flex items-center justify-between mb-6">
-                    <span className="px-4 py-1.5 rounded-full bg-secondary/50 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/10">
+                    <span className="px-4 py-1.5 rounded-full bg-secondary/50 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/10 group-hover:border-primary/30 transition-colors">
                       {post.category_name}
                     </span>
                     <div className="flex flex-col items-end gap-1">
-                      <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-xl group-hover:bg-primary group-hover:text-white transition-colors">
+                      <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-xl group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all duration-300 shadow-sm">
                         {post.price > 0 && !post.is_owned ? '🔒' : '🏋️'}
                       </div>
                       {post.price > 0 && (
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded ${post.is_owned ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded transition-all ${post.is_owned ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
                           {post.is_owned ? 'ĐÃ MUA' : `${Math.floor(post.price).toLocaleString('vi-VN')}đ`}
                         </span>
                       )}
@@ -190,7 +190,7 @@ export default function WorkoutsPage() {
 
                 <div className="mt-auto p-8 pt-6 bg-secondary/20 border-t border-border/30 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-card flex items-center justify-center border border-border/50 overflow-hidden shadow-sm group-hover:scale-110 transition-transform">
+                    <div className="w-10 h-10 rounded-2xl bg-card flex items-center justify-center border border-border/50 overflow-hidden shadow-sm group-hover:scale-110 transition-transform duration-300">
                       {post.coach_avatar ? (
                         <img src={`${API_BASE_URL}${post.coach_avatar}`} className="w-full h-full object-cover" />
                       ) : (
@@ -212,7 +212,7 @@ export default function WorkoutsPage() {
               </Card>
             </div>
           )) : !isLoading && (
-            <div className="col-span-full py-32 flex flex-col items-center justify-center text-center">
+            <div className="col-span-full py-32 flex flex-col items-center justify-center text-center animate-fade-in-up">
               <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center text-4xl mb-6 opacity-50">
                 🔍
               </div>
@@ -221,7 +221,7 @@ export default function WorkoutsPage() {
             </div>
           )}
           {isLoading && (
-            <div className="col-span-full py-40 flex flex-col items-center gap-4">
+            <div className="col-span-full py-40 flex flex-col items-center gap-4 animate-fade-in-up">
               <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
               <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Đang chuẩn bị lộ trình...</p>
             </div>
@@ -230,7 +230,7 @@ export default function WorkoutsPage() {
 
         {/* Detail Modal */}
         <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-          <DialogContent className="max-w-4xl p-0 bg-transparent border-none sm:rounded-[3rem] overflow-hidden">
+          <DialogContent className="max-w-4xl p-0 bg-transparent border-none sm:rounded-[3rem] overflow-hidden animate-scale-in">
             {selectedPost && (
               <div className="bg-card w-full max-h-[92vh] overflow-y-auto custom-scrollbar">
                 {/* Header Decoration */}

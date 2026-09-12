@@ -128,7 +128,6 @@ export default function UserDashboard() {
   const healthStats = data?.healthStats || {}
   const profile = data?.user || {}
 
-  // Determine time of day greeting
   const getGreeting = () => {
     const hour = new Date().getHours()
     if (hour < 12) return 'Chào buổi sáng ☀️'
@@ -136,24 +135,26 @@ export default function UserDashboard() {
     return 'Chào buổi tối 🌙'
   }
 
-  // Calculate BMI bar percentage (Range: 15 to 35 for visual representation)
   const bmiValue = healthStats.bmi || 22
   const bmiPercent = Math.min(Math.max(((bmiValue - 15) / (35 - 15)) * 100, 2), 98)
 
   return (
     <DashboardLayout navItems={navItems}>
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-8 animate-fade-in-up">
         {/* Top Header & Wallet */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-1.5 mb-1">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <div className="space-y-1">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2 mb-1">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+              </span>
               Tổng quan sức khỏe cá nhân
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
-              {getGreeting()}, <span className="text-gradient">{user.name}</span>!
+              {getGreeting()}, <span className="text-gradient-animated">{user.name}</span>!
             </h2>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="text-muted-foreground text-sm">
               Mục tiêu hiện tại:{' '}
               <span className="font-bold text-foreground">
                 {profile.goal === 'weight_loss' ? '🔥 Giảm mỡ / Giảm cân' :
@@ -164,20 +165,20 @@ export default function UserDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Card className="p-4 rounded-2xl bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-transparent border-primary/20 flex items-center gap-4 shadow-sm">
+            <Card className="p-4 rounded-2xl bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-transparent border-primary/20 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-70">Số dư ví</p>
                 <p className="text-2xl font-black text-primary">
                   {isLoading ? '...' : Math.floor(profile.balance || 0).toLocaleString('vi-VN')}đ
                 </p>
               </div>
-              <Button size="sm" className="rounded-xl font-bold btn-premium shadow-md" onClick={() => setIsTopUpOpen(true)}>
+              <Button size="sm" className="rounded-xl font-bold btn-premium shadow-md active:scale-95" onClick={() => setIsTopUpOpen(true)}>
                 + Nạp tiền
               </Button>
             </Card>
 
             <Dialog open={isTopUpOpen} onOpenChange={setIsTopUpOpen}>
-              <DialogContent className="max-w-md bg-card border-border rounded-[2.5rem] p-8">
+              <DialogContent className="max-w-md bg-card border-border rounded-[2.5rem] p-8 animate-scale-in">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-black">Nạp tiền vào ví 💳</DialogTitle>
                 </DialogHeader>
@@ -197,7 +198,7 @@ export default function UserDashboard() {
                         key={amt} 
                         variant="outline" 
                         size="sm"
-                        className={`rounded-xl text-xs font-bold transition-all ${topUpAmount === amt ? 'bg-primary text-primary-foreground border-primary shadow-sm' : ''}`}
+                        className={`rounded-xl text-xs font-bold transition-all active:scale-95 ${topUpAmount === amt ? 'bg-primary text-primary-foreground border-primary shadow-sm' : ''}`}
                         onClick={() => setTopUpAmount(amt)}
                       >
                         {parseInt(amt).toLocaleString()}đ
@@ -209,7 +210,7 @@ export default function UserDashboard() {
                   </p>
                 </div>
                 <DialogFooter>
-                  <Button onClick={handleTopUp} className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest btn-premium shadow-xl shadow-primary/20">
+                  <Button onClick={handleTopUp} className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest btn-premium shadow-xl shadow-primary/20 active:scale-95">
                     Xác nhận nạp tiền
                   </Button>
                 </DialogFooter>
@@ -218,25 +219,26 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* Quick Action Shortcuts */}
+        {/* Quick Action Shortcuts with Bounce Hover */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
           {[
-            { icon: '⚖️', label: 'Ghi cân nặng', href: '/dashboard/weight', bg: 'hover:border-amber-500/40' },
-            { icon: '🏋️', label: 'Bài tập hôm nay', href: '/dashboard/workouts', bg: 'hover:border-primary/40' },
-            { icon: '🥦', label: 'Thực đơn dinh dưỡng', href: '/dashboard/meals', bg: 'hover:border-emerald-500/40' },
-            { icon: '👨‍🏫', label: 'Đội ngũ HLV', href: '/dashboard/coaches', bg: 'hover:border-teal-500/40' },
+            { icon: '⚖️', label: 'Ghi cân nặng', href: '/dashboard/weight', bg: 'hover:border-amber-500/40 hover:shadow-amber-500/5' },
+            { icon: '🏋️', label: 'Bài tập hôm nay', href: '/dashboard/workouts', bg: 'hover:border-primary/40 hover:shadow-primary/5' },
+            { icon: '🥦', label: 'Thực đơn dinh dưỡng', href: '/dashboard/meals', bg: 'hover:border-emerald-500/40 hover:shadow-emerald-500/5' },
+            { icon: '👨‍🏫', label: 'Đội ngũ HLV', href: '/dashboard/coaches', bg: 'hover:border-teal-500/40 hover:shadow-teal-500/5' },
           ].map((action, idx) => (
             <button
               key={idx}
               onClick={() => router.push(action.href)}
-              className={`p-4 rounded-2xl bg-card border border-border/70 ${action.bg} hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 text-left shadow-sm group`}
+              className={`p-4 rounded-2xl bg-card border border-border/70 ${action.bg} hover:-translate-y-1.5 active:scale-95 transition-all duration-300 flex items-center gap-3 text-left shadow-sm group cursor-pointer`}
+              style={{ animationDelay: `${idx * 0.05}s` }}
             >
-              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl group-hover:scale-115 group-hover:-rotate-6 transition-transform duration-300 shadow-sm">
                 {action.icon}
               </div>
               <div>
                 <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">{action.label}</p>
-                <p className="text-[10px] text-muted-foreground">Truy cập nhanh →</p>
+                <p className="text-[10px] text-muted-foreground group-hover:translate-x-0.5 transition-transform">Truy cập nhanh →</p>
               </div>
             </button>
           ))}
@@ -245,11 +247,11 @@ export default function UserDashboard() {
         {/* Health Stats Grid with BMI Bar */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* BMI Gauge Card */}
-          <Card className="p-6 rounded-3xl bg-card border-border shadow-sm flex flex-col justify-between">
+          <Card className="p-6 rounded-3xl bg-card border-border shadow-sm flex flex-col justify-between hover:shadow-xl hover:border-primary/30 transition-all duration-300">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Chỉ số BMI</span>
-                <span className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                <span className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 ${
                   healthStats.category?.includes('Bình thường') ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' :
                   healthStats.category?.includes('Gầy') ? 'bg-blue-500/15 text-blue-600' :
                   'bg-orange-500/15 text-orange-600'
@@ -264,17 +266,17 @@ export default function UserDashboard() {
                 <span className="text-xs text-muted-foreground">kg/m²</span>
               </div>
 
-              {/* Spectrum Bar */}
+              {/* Spectrum Bar with Animated Indicator */}
               <div className="space-y-1.5">
-                <div className="relative h-3 rounded-full overflow-hidden flex bg-secondary">
-                  <div className="w-[17.5%] bg-blue-400" title="Gầy (<18.5)" />
-                  <div className="w-[32.5%] bg-emerald-400" title="Bình thường (18.5-24.9)" />
-                  <div className="w-[25%] bg-amber-400" title="Thừa cân (25-29.9)" />
-                  <div className="w-[25%] bg-rose-500" title="Béo phì (≥30)" />
+                <div className="relative h-3.5 rounded-full overflow-visible flex bg-secondary/80 p-0.5">
+                  <div className="w-[17.5%] h-full rounded-l-full bg-blue-400" title="Gầy (<18.5)" />
+                  <div className="w-[32.5%] h-full bg-emerald-400" title="Bình thường (18.5-24.9)" />
+                  <div className="w-[25%] h-full bg-amber-400" title="Thừa cân (25-29.9)" />
+                  <div className="w-[25%] h-full rounded-r-full bg-rose-500" title="Béo phì (≥30)" />
                   {healthStats.bmi && (
                     <div
-                      className="absolute top-0 bottom-0 w-1.5 bg-foreground rounded-full shadow-lg transition-all duration-700"
-                      style={{ left: `${bmiPercent}%` }}
+                      className="absolute -top-1 w-3 h-5 bg-foreground rounded-full shadow-lg ring-2 ring-primary/60 transition-all duration-1000 ease-out"
+                      style={{ left: `calc(${bmiPercent}% - 6px)` }}
                     />
                   )}
                 </div>
@@ -294,7 +296,7 @@ export default function UserDashboard() {
           </Card>
 
           {/* Calorie & Energy Card */}
-          <Card className="p-6 rounded-3xl bg-card border-border shadow-sm flex flex-col justify-between">
+          <Card className="p-6 rounded-3xl bg-card border-border shadow-sm flex flex-col justify-between hover:shadow-xl hover:border-primary/30 transition-all duration-300">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Calo Mục Tiêu</span>
@@ -320,7 +322,7 @@ export default function UserDashboard() {
             </div>
 
             <div className="mt-4 pt-4 border-t border-border/50 text-[11px] text-muted-foreground flex items-center gap-2">
-              <span>💡</span>
+              <span className="animate-bounce-subtle">💡</span>
               <span className="truncate">
                 {profile.goal === 'weight_loss' ? 'Đã trừ ~300-500 kcal tạo thâm hụt mỡ' :
                  profile.goal === 'muscle_gain' ? 'Đã cộng ~300 kcal để nuôi cơ bắp' : 'Mức năng lượng giữ cân ổn định'}
@@ -329,11 +331,11 @@ export default function UserDashboard() {
           </Card>
 
           {/* Hydration & Daily Advice Card */}
-          <Card className="p-6 rounded-3xl bg-gradient-to-br from-primary/10 via-teal-500/5 to-transparent border-primary/20 shadow-sm flex flex-col justify-between">
+          <Card className="p-6 rounded-3xl bg-gradient-to-br from-primary/10 via-teal-500/5 to-transparent border-primary/20 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all duration-300">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Lời khuyên hôm nay</span>
-                <span className="text-xl">💧</span>
+                <span className="text-xl animate-bounce-subtle">💧</span>
               </div>
               <h4 className="font-bold text-foreground text-sm mb-2">Uống đủ nước & Giữ nhịp độ</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -343,16 +345,16 @@ export default function UserDashboard() {
 
             <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
               <span className="text-xs text-muted-foreground font-medium">Cần tư vấn thêm?</span>
-              <Button size="sm" variant="ghost" onClick={handleGenerateRec} className="text-xs font-bold text-primary hover:text-primary">
+              <Button size="sm" variant="ghost" onClick={handleGenerateRec} className="text-xs font-bold text-primary hover:text-primary active:scale-95">
                 Hỏi AI ngay →
               </Button>
             </div>
           </Card>
         </div>
 
-        {/* Coach Promotion Card */}
-        <Card className="p-8 rounded-[2rem] bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border-primary/20 shadow-sm">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* Coach Promotion Card with Shimmer Badge */}
+        <Card className="p-8 rounded-[2rem] bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border-primary/25 shadow-md relative overflow-hidden shimmer-badge">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
             <div className="flex-1 space-y-2 text-center md:text-left">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 text-primary text-[10px] font-black uppercase tracking-wider">
                 <span>🏆</span> Huấn luyện viên 1-Kèm-1
@@ -366,7 +368,7 @@ export default function UserDashboard() {
             </div>
             <Button
               onClick={() => router.push('/dashboard/coaches')}
-              className="rounded-2xl px-8 py-6 font-black text-sm uppercase tracking-wider btn-premium shadow-xl shadow-primary/20 shrink-0"
+              className="rounded-2xl px-8 py-6 font-black text-sm uppercase tracking-wider btn-premium shadow-xl shadow-primary/20 shrink-0 active:scale-95 hover:scale-105 transition-all"
             >
               Xem đội ngũ HLV →
             </Button>
@@ -377,21 +379,26 @@ export default function UserDashboard() {
         <div className="mt-12 mb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-8 bg-accent rounded-full" />
+              <div className="w-2 h-8 bg-accent rounded-full animate-pulse" />
               <h3 className="text-2xl font-black text-foreground">Gợi ý lộ trình cho bạn</h3>
             </div>
             <div className="flex items-center gap-2">
-              <Button onClick={handleGenerateRec} disabled={isGeneratingRec} className="font-bold bg-gradient-to-r from-accent to-primary text-white shadow-lg shadow-accent/20">
+              <Button onClick={handleGenerateRec} disabled={isGeneratingRec} className="font-bold bg-gradient-to-r from-accent to-primary text-white shadow-lg shadow-accent/20 active:scale-95 transition-all">
                 {isGeneratingRec ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : '✨ Gợi ý Lộ trình AI'}
               </Button>
-              <Button variant="ghost" className="text-xs font-bold text-accent" onClick={() => router.push('/dashboard/routes')}>Xem tất cả →</Button>
+              <Button variant="ghost" className="text-xs font-bold text-accent hover:text-accent active:scale-95" onClick={() => router.push('/dashboard/routes')}>Xem tất cả →</Button>
             </div>
           </div>
 
           {!isLoading && recommendations.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendations.map((route: any) => (
-                <Card key={route.id} className="group overflow-hidden rounded-3xl bg-card border-border hover:border-accent/50 transition-all hover:shadow-2xl hover:shadow-accent/5 cursor-pointer" onClick={() => router.push(`/dashboard/routes/${route.id}`)}>
+              {recommendations.map((route: any, idx: number) => (
+                <Card 
+                  key={route.id} 
+                  className="group overflow-hidden rounded-3xl bg-card border-border hover:border-accent/50 transition-all duration-300 hover:shadow-2xl hover:shadow-accent/10 hover:-translate-y-1.5 cursor-pointer" 
+                  style={{ animationDelay: `${idx * 0.05}s` }}
+                  onClick={() => router.push(`/dashboard/routes/${route.id}`)}
+                >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

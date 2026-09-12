@@ -94,14 +94,14 @@ export default function CoachesPage() {
                     {!isLoading && coaches.length > 0 ? coaches.map((coach, idx) => (
                         <div
                             key={coach.id}
-                            className="group animate-in"
-                            style={{ animationDelay: `${idx * 0.05}s` }}
+                            className="group animate-fade-in-up"
+                            style={{ animationDelay: `${idx * 0.06}s` }}
                         >
-                            <Card className="p-8 rounded-[2.5rem] bg-card border-border/50 hover:border-primary/30 transition-all duration-500 flex flex-col h-full shadow-sm hover:shadow-2xl hover:-translate-y-2 overflow-hidden relative">
+                            <Card className="p-8 rounded-[2.5rem] bg-card border-border/50 hover:border-primary/40 transition-all duration-300 flex flex-col h-full shadow-sm hover:shadow-2xl hover:-translate-y-2 overflow-hidden relative">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -mr-10 -mt-10 blur-2xl group-hover:bg-primary/10 transition-colors" />
 
                                 <Link href={`/dashboard/coaches/${coach.id}`} className="flex flex-col items-center text-center mb-8 relative z-10 cursor-pointer block">
-                                    <div className="w-24 h-24 rounded-[2rem] bg-secondary flex items-center justify-center p-1 border-4 border-card shadow-xl mb-6 group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+                                    <div className="w-24 h-24 rounded-[2rem] bg-secondary flex items-center justify-center p-1 border-4 border-card shadow-xl mb-6 group-hover:scale-110 group-hover:rotate-2 transition-transform duration-300 overflow-hidden">
                                         {coach.avatar_url ? (
                                             <img src={`${API_BASE_URL}${coach.avatar_url}`} className="w-full h-full object-cover rounded-[1.75rem]" />
                                         ) : (
@@ -110,12 +110,12 @@ export default function CoachesPage() {
                                     </div>
                                     <h4 className="font-black text-2xl text-foreground mb-1 group-hover:text-primary transition-colors">{coach.full_name}</h4>
                                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest opacity-60 mb-4">{coach.email}</p>
-                                    <div className="text-[10px] font-bold text-primary bg-primary/10 px-4 py-1.5 rounded-full uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">Xem hồ sơ &rarr;</div>
+                                    <div className="text-[10px] font-black text-primary bg-primary/10 px-4 py-1.5 rounded-full uppercase tracking-widest opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-1 transition-all duration-300">Xem hồ sơ &rarr;</div>
                                 </Link>
 
                                 <div className="space-y-6 mt-auto relative z-10">
                                     <div className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest">
-                                        <span>💎</span>
+                                        <span className="animate-bounce-subtle">💎</span>
                                         <span>Chuyên gia FitVibe Elite</span>
                                     </div>
 
@@ -133,7 +133,7 @@ export default function CoachesPage() {
                                     <Button
                                         className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.15em] transition-all shadow-xl active:scale-95 ${coach.is_enrolled
                                             ? 'bg-secondary text-foreground hover:bg-secondary/80 shadow-secondary/20'
-                                            : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/30'
+                                            : 'btn-premium text-white shadow-primary/30'
                                             }`}
                                         onClick={() => coach.is_enrolled ? handleCancelEnroll(coach.id) : handleEnroll(coach.id)}
                                         disabled={enrollingStatus !== null}

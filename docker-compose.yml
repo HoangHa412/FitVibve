@@ -9,8 +9,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: fitvibe_db_password_2026
       MYSQL_DATABASE: fitvibe
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"
     volumes:
       - fitvibe_mysql_data:/var/lib/mysql
       - ./init_database_complete.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -34,9 +34,9 @@ services:
       DB_PASSWORD: fitvibe_db_password_2026
       DB_NAME: fitvibe
       JWT_SECRET: fitvibe_jwt_super_secret_key_2026
-      FRONTEND_URL: http://localhost:3000
-    ports:
-      - "5000:5000"
+      FRONTEND_URL: https://vscode.familyfoodsmarket.com
+    # ports:
+    #   - "5000:5000"
     volumes:
       - ./BE/uploads:/app/uploads
     depends_on:
@@ -51,10 +51,16 @@ services:
     environment:
       PORT: 3000
       BACKEND_INTERNAL_URL: http://backend:5000
-    ports:
-      - "3000:3000"
+    networks:
+      - default
+      - odoo
     depends_on:
       - backend
 
 volumes:
   fitvibe_mysql_data:
+
+networks:
+  default:
+  odoo:
+    external: true

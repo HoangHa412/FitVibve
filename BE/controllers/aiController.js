@@ -1,38 +1,99 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const pool = require('../config/db');
+const { calculateBMI, calculateBMR, calculateTDEE, calculateTargetCalories } = require('../utils/healthCalculator');
 
-const SYSTEM_PROMPT = `Bạn là trợ lý AI của hệ thống FitVibe - Nền tảng quản lý tập luyện và sức khỏe chuyên nghiệp.
-Bạn hỗ trợ khách hàng tư vấn về:
-- Lịch tập luyện: Fitness, Bodybuilding, Yoga, Cardio, HIIT.
-- Dinh dưỡng: Chế độ ăn tăng cơ, giảm mỡ, thực phẩm bổ sung (Whey, BCAA...), tính toán Macro.
-- Dịch vụ của FitVibe: Đăng ký gói tập, tìm kiếm huấn luyện viên (Coach), đặt lịch hẹn.
-- Sản phẩm: Đồ tập, phụ kiện hỗ trợ, thực phẩm chức năng.
-- Chăm sóc sức khỏe: Giấc ngủ, phục hồi cơ bắp, tránh chấn thương.
+const BASE_SYSTEM_PROMPT = `Bạn là FitVibe Coach AI - Chuyên gia Huấn luyện Thể hình & Cố vấn Dinh dưỡng của nền tảng thể thao trực tuyến FitVibe.
 
-Quy tắc trả lời:
-- Luôn trả lời bằng tiếng Việt, chuyên nghiệp, truyền cảm hứng và khoa học.
-- Giữ câu trả lời ngắn gọn, súc tích (tối đa 3-4 câu trừ khi khách cần chi tiết hoặc giáo án).
-- Xưng hô: "FitVibe" (hoặc "mình") và "bạn". 
-- Nếu không biết thông tin cụ thể về tài khoản khách hàng, hãy hướng dẫn khách liên hệ bộ phận hỗ trợ hoặc xem trong phần Profile.
-- Không trả lời các chủ đề không liên quan đến thể hình, sức khỏe hoặc FitVibe.`;
+🎯 MỤC TIÊU VÀ NHIỆM VỤ:
+- Tư vấn phương pháp và kỹ thuật tập luyện an toàn, bài bản (Gym, Thể hình, Cardio, HIIT, Calisthenics, Yoga, Giãn cơ).
+- Cố vấn dinh dưỡng khoa học (Eat Clean, phân bổ Macro Protein/Carb/Fat, tính toán calo nạp và tiêu thụ theo mục tiêu).
+- Hướng dẫn học viên khai thác tối đa các phân hệ trên nền tảng FitVibe.
+
+🗺️ KIẾN THỨC VỀ HỆ THỐNG FITVIBE (HÃY CHỦ ĐỘNG HƯỚNG DẪN KHI PHÙ HỢP):
+- "Lộ trình tập luyện": Tổ chức theo từng Giai đoạn (Stage) tuần tự. Học viên xem bài tập, quay video thực hành nộp lên hệ thống để Huấn luyện viên (Coach) chấm điểm và duyệt "Đạt" mới được mở khóa Giai đoạn tiếp theo.
+- "Theo dõi sức khỏe": Xem BMI, BMR, TDEE và ghi nhật ký cân nặng tại Dashboard để theo dõi tiến độ vóc dáng.
+- "Ví cá nhân & Nạp tiền": Học viên có thể nạp tiền ví qua Cổng thanh toán trực tuyến VNPay để đăng ký các lộ trình nâng cao.
+- "Đội ngũ Huấn luyện viên (Coach)": Các HLV sở hữu chứng chỉ quốc tế (NASM, ACE, ACSM, ISSA) trực tiếp sửa form động tác và đồng hành.
+
+⛔ NGUYÊN TẮC BẮT BUỘC (GUARDRAILS):
+1. PHẠM VI TRẢ LỜI: CHỈ TRẢ LỜI các chủ đề liên quan đến thể hình, rèn luyện thể chất, chế độ ăn uống lành mạnh, phục hồi chấn thương và các tính năng của FitVibe.
+2. TỪ CHỐI CÂU HỎI NGOÀI PHẠM VI: Nếu người dùng hỏi các chủ đề không liên quan (chính trị, tin tức, viết code, giải toán, giải trí...), hãy từ chối lịch sự và hướng về sức khỏe:
+   "FitVibe Coach chỉ có thể hỗ trợ bạn về luyện tập thể hình, dinh dưỡng và hệ thống FitVibe. Bạn có câu hỏi nào về mục tiêu vóc dáng hôm nay không?"
+3. ĐỘ DÀI & ĐỊNH DẠNG:
+   - Trả lời ngắn gọn, súc tích, đi thẳng vào trọng tâm (3 - 5 câu, tối đa 200 từ).
+   - Sử dụng định dạng Markdown rõ ràng, in đậm các con số quan trọng, tên bài tập hoặc thực phẩm.
+   - Xưng hô thân thiện, truyền cảm hứng: "FitVibe Coach" (hoặc "mình") và "bạn".`;
+
+const buildUserContextPrompt = (userInfo) => {
+  if (!userInfo) return '';
+
+  let context = `\n\n👤 THÔNG TIN HỌC VIÊN ĐANG TRÒ CHUYỆN:
+- Tên học viên: ${userInfo.full_name || userInfo.name || 'Bạn'}
+- Giới tính: ${userInfo.gender === 'male' ? 'Nam' : userInfo.gender === 'female' ? 'Nữ' : 'Chưa cập nhật'}
+- Tuổi: ${userInfo.age || 'Chưa cập nhật'}
+- Chiều cao: ${userInfo.height ? userInfo.height + ' cm' : 'Chưa cập nhật'}
+- Cân nặng: ${userInfo.weight ? userInfo.weight + ' kg' : 'Chưa cập nhật'}`;
+
+  if (userInfo.height && userInfo.weight) {
+    const bmiData = calculateBMI(Number(userInfo.weight), Number(userInfo.height));
+    context += `\n- Chỉ số BMI: ${bmiData.bmi} (${bmiData.category})`;
+
+    if (userInfo.age && userInfo.gender) {
+      const bmr = calculateBMR(Number(userInfo.weight), Number(userInfo.height), Number(userInfo.age), userInfo.gender);
+      const tdee = calculateTDEE(bmr, 1.375);
+      context += `\n- Chỉ số BMR: ~${bmr} kcal/ngày`;
+      context += `\n- Năng lượng tiêu hao mỗi ngày (TDEE): ~${tdee} kcal/ngày`;
+      
+      if (userInfo.fitness_goal) {
+        const targetCal = calculateTargetCalories(tdee, userInfo.fitness_goal);
+        context += `\n- Mục tiêu: ${userInfo.fitness_goal === 'weight_loss' ? 'Giảm cân/giảm mỡ' : userInfo.fitness_goal === 'muscle_gain' ? 'Tăng cơ' : 'Duy trì vóc dáng'} (Mức calo khuyến nghị: ~${targetCal} kcal/ngày)`;
+      }
+    }
+  }
+
+  context += `\n👉 HÃY ÁP DỤNG TRỰC TIẾP các chỉ số thể trạng trên để đưa ra lời khuyên cá nhân hóa chính xác cho học viên này. Hãy gọi tên học viên một cách thân thiện.`;
+  return context;
+};
 
 const geminiChat = async (req, res) => {
   try {
-    const { message, history = [] } = req.body;
+    const { message, history = [], userContext: clientContext } = req.body;
 
     if (!message || !message.trim()) {
       return res.status(400).json({ success: false, message: 'Tin nhắn không được để trống' });
     }
 
-    // Attempt 1: Gemini
+    // Attempt to extract logged-in user information for Context Injection
+    let userInfo = clientContext || null;
+    const authHeader = req.header('Authorization');
+    const token = authHeader ? authHeader.replace(/^Bearer\s+/i, '') : null;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fitvibe_jwt_super_secret_key_2026');
+        if (decoded && decoded.id) {
+          const [rows] = await pool.query(
+            'SELECT full_name, gender, height, weight, age, activity_level, fitness_goal FROM users WHERE id = ?',
+            [decoded.id]
+          );
+          if (rows && rows.length > 0) {
+            userInfo = { ...rows[0], ...(clientContext || {}) };
+          }
+        }
+      } catch (err) {
+        // Token invalid or expired, continue with guest/clientContext
+      }
+    }
+
+    const contextualSystemInstruction = BASE_SYSTEM_PROMPT + buildUserContextPrompt(userInfo);
+
+    // Attempt 1: Gemini (Preferred: Gemini 3.5 with fallback to 2.5)
     try {
       const apiKey = process.env.GEMINI_API_KEY;
       if (apiKey && apiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-1.5-flash',
-          systemInstruction: SYSTEM_PROMPT,
-        });
+        const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
 
         let chatHistory = history.map((msg) => ({
           role: msg.role === 'user' ? 'user' : 'model',
@@ -47,12 +108,37 @@ const geminiChat = async (req, res) => {
           chatHistory = [];
         }
 
-        const chat = model.startChat({ history: chatHistory });
-        const result = await chat.sendMessage(message.trim());
-        return res.json({ success: true, reply: result.response.text(), provider: 'Gemini' });
+        try {
+          const model = genAI.getGenerativeModel({
+            model: primaryModel,
+            systemInstruction: contextualSystemInstruction,
+            generationConfig: {
+              temperature: 0.35, // Focus, low hallucination, concise
+              maxOutputTokens: 1000,
+              topP: 0.85,
+            }
+          });
+          const chat = model.startChat({ history: chatHistory });
+          const result = await chat.sendMessage(message.trim());
+          return res.json({ success: true, reply: result.response.text(), provider: `Gemini (${primaryModel})` });
+        } catch (modelErr) {
+          console.warn(`⚠️ ${primaryModel} failed or busy, auto-falling back to gemini-2.5-flash:`, modelErr.message);
+          const fallbackModel = genAI.getGenerativeModel({
+            model: 'gemini-2.5-flash',
+            systemInstruction: contextualSystemInstruction,
+            generationConfig: {
+              temperature: 0.35,
+              maxOutputTokens: 1000,
+              topP: 0.85,
+            }
+          });
+          const chat = fallbackModel.startChat({ history: chatHistory });
+          const result = await chat.sendMessage(message.trim());
+          return res.json({ success: true, reply: result.response.text(), provider: 'Gemini (gemini-2.5-flash)' });
+        }
       }
     } catch (error) {
-      console.warn('⚠️ Gemini fallback triggered:', error.message);
+      console.warn('⚠️ Gemini error:', error.message);
     }
 
     // Attempt 2: Groq
@@ -64,11 +150,12 @@ const geminiChat = async (req, res) => {
           {
             model: 'llama-3.3-70b-versatile',
             messages: [
-              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'system', content: contextualSystemInstruction },
               ...history.map((m) => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content })),
               { role: 'user', content: message },
             ],
-            max_tokens: 1000,
+            max_tokens: 650,
+            temperature: 0.35,
           },
           { headers: { Authorization: `Bearer ${groqKey}` } }
         );
@@ -87,10 +174,11 @@ const geminiChat = async (req, res) => {
           {
             model: 'google/gemini-2.0-flash-exp:free',
             messages: [
-              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'system', content: contextualSystemInstruction },
               ...history.map((m) => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content })),
               { role: 'user', content: message },
             ],
+            temperature: 0.35,
           },
           { headers: { Authorization: `Bearer ${openRouterKey}` } }
         );
@@ -100,12 +188,19 @@ const geminiChat = async (req, res) => {
       console.warn('⚠️ OpenRouter fallback triggered:', error.response?.data || error.message);
     }
 
-    // Attempt 4: Intelligent Built-in Assistant Fallback (when external API keys are unset/busy)
+    // Attempt 4: Contextual Built-in Assistant Fallback (when API keys are unset)
+    const displayName = userInfo?.full_name || userInfo?.name || 'bạn';
+    let contextualNote = '';
+    if (userInfo?.height && userInfo?.weight) {
+      const bmi = (Number(userInfo.weight) / Math.pow(Number(userInfo.height) / 100, 2)).toFixed(1);
+      contextualNote = ` (Chỉ số BMI hiện tại của ${displayName}: ${bmi})`;
+    }
+
     const defaultReplies = [
-      'FitVibe khuyên bạn nên duy trì chế độ tập luyện 3-5 buổi/tuần, kết hợp hài hòa giữa bài tập kháng lực (Gym/Calisthenics) và Cardio để tối ưu hóa việc tiêu hao năng lượng và xây dựng cơ bắp.',
-      'Về dinh dưỡng, hãy ưu tiên các nguồn đạm chất lượng cao (ức gà, trứng, cá, đậu), tinh bột phức hợp (gạo lứt, khoai lang, yến mạch) và bổ sung tối thiểu 2-2.5 lít nước mỗi ngày.',
-      'Để đạt mục tiêu vóc dáng nhanh nhất, bạn có thể tham khảo các lộ trình và giáo án chi tiết từ các Huấn luyện viên (Coach) chuyên nghiệp trong mục "Lộ trình tập luyện".',
-      'Chào bạn! FitVibe luôn sẵn sàng hỗ trợ bạn theo dõi cân nặng, tính toán chỉ số TDEE/BMR và cung cấp các bài tập bài bản nhất.'
+      `Chào ${displayName}!${contextualNote} Với mục tiêu rèn luyện thể chất, FitVibe khuyên bạn nên duy trì 3-5 buổi tập/tuần, kết hợp bài tập kháng lực (Gym/Calisthenics) và Cardio để tối ưu hiệu quả xây dựng cơ bắp và tiêu hao mỡ thừa.`,
+      `Chào ${displayName}! Về dinh dưỡng khoa học, hãy ưu tiên các nguồn đạm nạc chất lượng cao (ức gà, cá, trứng), tinh bột hấp thu chậm (gạo lứt, yến mạch) và duy trì tối thiểu 2 - 2.5 lít nước mỗi ngày nhé.`,
+      `Để tiến bộ nhanh nhất, ${displayName} có thể truy cập mục "Lộ trình tập luyện" trên FitVibe để theo dõi các bài tập theo từng Giai đoạn và nộp video thực hành để Huấn luyện viên sửa form động tác nhé!`,
+      `Chào ${displayName}! Bạn có thể theo dõi biến động cân nặng và các chỉ số BMR/TDEE trực tiếp tại trang Dashboard của FitVibe để liên tục điều chỉnh khẩu phần ăn phù hợp nhất.`
     ];
     const randomReply = defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
 
@@ -164,13 +259,31 @@ Hãy viết một cách truyền cảm hứng, chuyên nghiệp và rõ ràng. K
       const apiKey = process.env.GEMINI_API_KEY;
       if (apiKey && apiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-1.5-flash',
-          systemInstruction: SYSTEM_PROMPT,
-        });
-
-        const result = await model.generateContent(prompt);
-        return res.json({ success: true, recommendation: result.response.text(), provider: 'Gemini' });
+        const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+        try {
+          const model = genAI.getGenerativeModel({
+            model: primaryModel,
+            systemInstruction: BASE_SYSTEM_PROMPT,
+            generationConfig: {
+              temperature: 0.35,
+              maxOutputTokens: 1200,
+            }
+          });
+          const result = await model.generateContent(prompt);
+          return res.json({ success: true, recommendation: result.response.text(), provider: `Gemini (${primaryModel})` });
+        } catch (mErr) {
+          console.warn(`⚠️ ${primaryModel} failed in recommendation, falling back to gemini-2.5-flash:`, mErr.message);
+          const fallbackModel = genAI.getGenerativeModel({
+            model: 'gemini-2.5-flash',
+            systemInstruction: BASE_SYSTEM_PROMPT,
+            generationConfig: {
+              temperature: 0.35,
+              maxOutputTokens: 1200,
+            }
+          });
+          const result = await fallbackModel.generateContent(prompt);
+          return res.json({ success: true, recommendation: result.response.text(), provider: 'Gemini (gemini-2.5-flash)' });
+        }
       }
     } catch (error) {
       console.warn('⚠️ Gemini fallback triggered in recommendation:', error.message);
@@ -185,10 +298,11 @@ Hãy viết một cách truyền cảm hứng, chuyên nghiệp và rõ ràng. K
           {
             model: 'llama-3.3-70b-versatile',
             messages: [
-              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'system', content: BASE_SYSTEM_PROMPT },
               { role: 'user', content: prompt },
             ],
             max_tokens: 1500,
+            temperature: 0.35,
           },
           { headers: { Authorization: `Bearer ${groqKey}` } }
         );

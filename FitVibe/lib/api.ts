@@ -424,11 +424,11 @@ export const coachApi = {
 
 // ── AI ────────────────────────────────────────────────────────────────
 export const aiApi = {
-    chat: (message: string, history?: { role: string, content: string }[]) =>
-        request<{ success: boolean; reply: string }>('/api/ai/chat', {
+    chat: (message: string, history?: { role: string, content: string }[], userContext?: any) =>
+        request<{ success: boolean; reply: string; provider?: string }>('/api/ai/chat', {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ message, history }),
+            body: JSON.stringify({ message, history, userContext }),
         }),
     getRecommendation: (profileData: any) =>
         request<{ success: boolean; recommendation: string }>('/api/ai/recommendation', {

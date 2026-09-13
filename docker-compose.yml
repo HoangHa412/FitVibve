@@ -26,6 +26,8 @@ services:
       context: ./BE
     container_name: fitvibe-backend
     restart: unless-stopped
+    env_file:
+      - ./BE/.env
     environment:
       PORT: 5000
       DB_HOST: db
@@ -39,6 +41,10 @@ services:
     #   - "5000:5000"
     volumes:
       - ./BE/uploads:/app/uploads
+      - ./BE/controllers:/app/controllers
+      - ./BE/routes:/app/routes
+      - ./BE/config:/app/config
+      - ./BE/utils:/app/utils
     depends_on:
       db:
         condition: service_healthy

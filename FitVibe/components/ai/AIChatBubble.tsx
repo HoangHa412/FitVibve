@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { aiApi } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 interface Message {
@@ -23,13 +24,14 @@ interface Message {
 }
 
 const QUICK_PROMPTS = [
-  '🥗 Gợi ý thực đơn Eat Clean',
-  '💪 Lịch tập tăng cơ 4 buổi/tuần',
-  '💧 Cách tính lượng nước cần uống',
-  '🔥 Bài tập Cardio đốt mỡ nhanh',
+  '🔥 Tính lượng calo cần nạp theo thể trạng của tôi',
+  '🏋️ Tôi nên bắt đầu từ lộ trình nào trên FitVibe?',
+  '🥗 Gợi ý thực đơn tăng cơ giảm mỡ hôm nay',
+  '❓ Làm sao để HLV mở khóa bài tập giai đoạn tiếp theo?'
 ];
 
 export default function AIChatBubble() {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState('');
@@ -63,7 +65,12 @@ export default function AIChatBubble() {
         content: msg.content
       }));
 
-      const response = await aiApi.chat(userMessage.content, history);
+      const userContext = user ? {
+        name: user.name,
+        role: user.role,
+      } : undefined;
+
+      const response = await aiApi.chat(userMessage.content, history, userContext);
       
       if (response.success) {
         setMessages((prev) => [

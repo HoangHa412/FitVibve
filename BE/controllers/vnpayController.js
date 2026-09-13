@@ -28,10 +28,9 @@ const createVNPayPayment = async (req, res) => {
         }
 
         const userId = req.user.id;
-        let date = new Date();
-        let createDate = moment(date).format('YYYYMMDDHHmmss');
-        
-        let orderId = moment(date).format('DDHHmmss');
+        let date = moment().utcOffset('+07:00');
+        let createDate = date.format('YYYYMMDDHHmmss');
+        let orderId = date.format('DDHHmmss');
         let txnRef = `${userId}T${orderId}`; // Format: userIdTtimestamp
 
         // Insert pending transaction
@@ -46,7 +45,7 @@ const createVNPayPayment = async (req, res) => {
             req.ip || '127.0.0.1';
             
         if (ipAddr.includes(',')) ipAddr = ipAddr.split(',')[0].trim();
-        if (ipAddr === '::1' || ipAddr === '::ffff:127.0.0.1') ipAddr = '127.0.0.1';
+        if (ipAddr === '::1' || ipAddr === '::ffff:127.0.0.1' || ipAddr.includes(':')) ipAddr = '127.0.0.1';
 
         let tmnCode = vnpayConfig.vnp_TmnCode;
         let secretKey = vnpayConfig.vnp_HashSecret;

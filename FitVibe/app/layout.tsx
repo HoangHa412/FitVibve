@@ -41,20 +41,24 @@ export const metadata: Metadata = {
   },
 }
 
+import { ThemeProvider } from '@/components/theme-provider'
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased text-foreground bg-background`}>
-        <AuthProvider>
-          {children}
-          <AIChatBubble />
-          <Toaster position="top-center" richColors />
-          <Analytics />
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            {children}
+            <AIChatBubble />
+            <Toaster position="top-center" richColors />
+            <Analytics />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

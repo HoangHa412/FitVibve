@@ -33,6 +33,10 @@
   --ring: 160 84% 39%;
 
   --radius: 1.25rem;
+
+  /* Logo Branding Variables */
+  --fitvibe-logo-figure: #0eb880;
+  --fitvibe-logo-text: #0f172a;
 }
 
 .dark {
@@ -43,6 +47,10 @@
   --card-foreground: 210 40% 98%;
   --popover: 222 47% 7%;
   --popover-foreground: 210 40% 98%;
+
+  /* Logo Branding Variables in Dark Mode: Luminous Emerald & Pure Crisp White */
+  --fitvibe-logo-figure: #00f5a0;
+  --fitvibe-logo-text: #ffffff;
 
   --primary: 160 84% 45%;
   --primary-foreground: 222 47% 4%;
@@ -396,4 +404,14 @@
 
 .sidebar-item-active {
   @apply bg-primary/10 text-primary border-r-4 border-primary shadow-[inset_-4px_0_0_0_hsl(var(--primary))];
+}
+
+/* Logo Dynamic Glow Styling */
+.fitvibe-logo-glow {
+  transition: fill 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .fitvibe-logo-glow,
+[data-theme='dark'] .fitvibe-logo-glow {
+  filter: drop-shadow(0 0 12px rgba(0, 245, 160, 0.65)) !important;
 }

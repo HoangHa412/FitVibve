@@ -4,6 +4,7 @@ import { useState } from 'react'
 import LoginForm from '@/components/auth/LoginForm'
 import SignupForm from '@/components/auth/SignupForm'
 import FitVibeLogo from '@/components/FitVibeLogo'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 export default function LandingPage() {
   const [showLogin, setShowLogin] = useState(true)
@@ -23,6 +24,7 @@ export default function LandingPage() {
           <FitVibeLogo className="h-10 sm:h-12 w-auto hover:opacity-90 transition-opacity" />
         </div>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <span className="hidden sm:inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold shadow-sm backdrop-blur-md">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -92,30 +94,33 @@ export default function LandingPage() {
             {/* Top Accent Gradient Bar */}
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 animate-gradient-flow" style={{ backgroundSize: '200% 100%' }} />
 
-            {/* Toggle Switch */}
-            <div className="flex p-1.5 rounded-2xl bg-secondary/60 mb-6 border border-border/50 backdrop-blur-sm">
-              <button
-                type="button"
-                onClick={() => setShowLogin(true)}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 active:scale-95 ${
-                  showLogin
-                    ? 'bg-card text-foreground shadow-md -translate-y-0.5'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Đăng nhập
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowLogin(false)}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 active:scale-95 ${
-                  !showLogin
-                    ? 'bg-card text-foreground shadow-md -translate-y-0.5'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Đăng ký tài khoản
-              </button>
+            {/* Toggle Switch & Theme Toggle */}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="flex-1 flex p-1.5 rounded-2xl bg-secondary/60 border border-border/50 backdrop-blur-sm">
+                <button
+                  type="button"
+                  onClick={() => setShowLogin(true)}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 active:scale-95 ${
+                    showLogin
+                      ? 'bg-card text-foreground shadow-md -translate-y-0.5'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Đăng nhập
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowLogin(false)}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 active:scale-95 ${
+                    !showLogin
+                      ? 'bg-card text-foreground shadow-md -translate-y-0.5'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Đăng ký tài khoản
+                </button>
+              </div>
+              <ThemeToggle variant="icon" />
             </div>
 
             {/* Forms with Transition */}
@@ -143,8 +148,12 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 max-w-7xl mx-auto w-full px-6 py-6 text-center text-xs text-muted-foreground opacity-60 border-t border-border/30">
-        © 2026 FitVibe Platform. All rights reserved. Nền tảng thể hình & dinh dưỡng thông minh.
+      <footer className="relative z-10 max-w-7xl mx-auto w-full px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground border-t border-border/30">
+        <div>© 2026 FitVibe Platform. All rights reserved. Nền tảng thể hình & dinh dưỡng thông minh.</div>
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] opacity-75 hidden md:inline">Tùy chỉnh giao diện:</span>
+          <ThemeToggle variant="pill" />
+        </div>
       </footer>
     </div>
   )

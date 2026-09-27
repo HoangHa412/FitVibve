@@ -33,11 +33,14 @@ export default function AdminDashboard() {
             adminApi.getPendingPosts(),
             adminApi.getPendingCoaches(),
           ])
-          setStats(statsData)
-          setPendingPosts(postsData as any[])
-          setPendingCoaches(coachesData as any[])
+          setStats(statsData && typeof statsData === 'object' ? statsData : { total_users: 0, new_posts_month: 0 })
+          setPendingPosts(Array.isArray(postsData) ? postsData : [])
+          setPendingCoaches(Array.isArray(coachesData) ? coachesData : [])
         } catch (error) {
           console.error("Error fetching admin data:", error)
+          setStats({ total_users: 0, new_posts_month: 0 })
+          setPendingPosts([])
+          setPendingCoaches([])
         } finally {
           setIsDataLoading(false)
         }
@@ -141,7 +144,7 @@ export default function AdminDashboard() {
                 <div key={post.id} className="flex items-center justify-between p-3 rounded-lg bg-yellow-50 border border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
                   <div>
                     <p className="text-sm font-medium text-foreground">{post.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Lúc {new Date(post.created_at).toLocaleString('vi-VN')}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Lúc {post.created_at ? new Date(post.created_at).toLocaleString('vi-VN') : 'Gần đây'}</p>
                   </div>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" className="text-xs" onClick={() => handleApprove(post.id)}>Phê duyệt</Button>
@@ -177,9 +180,9 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   
-                  {coach.certificates && (
+                  {coach.certificates && typeof coach.certificates === 'string' && (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {coach.certificates.split(',').map((url: string, idx: number) => (
+                      {coach.certificates.split(',').filter(Boolean).map((url: string, idx: number) => (
                         <div 
                           key={idx}
                           onClick={() => setSelectedImage(`${API_BASE_URL}${url}`)}

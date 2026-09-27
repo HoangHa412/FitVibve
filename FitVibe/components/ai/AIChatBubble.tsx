@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import { aiApi } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface Message {
@@ -31,7 +32,8 @@ const QUICK_PROMPTS = [
 ];
 
 export default function AIChatBubble() {
-  const { user } = useAuth();
+  const pathname = usePathname();
+  const { user, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState('');
@@ -45,6 +47,11 @@ export default function AIChatBubble() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
+
+  // Tắt khung chat ở trang đăng nhập / landing page hoặc khi người dùng chưa đăng nhập
+  if (loading || !user || pathname === '/' || pathname?.startsWith('/auth')) {
+    return null;
+  }
 
   const sendMessage = async (textToSend: string) => {
     if (!textToSend.trim() || isLoading) return;

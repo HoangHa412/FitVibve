@@ -1,6 +1,9 @@
-import React from 'react'
+'use client'
 
-export type FitVibeLogoTheme = 'contrast' | 'emerald' | 'darkgreen' | 'black' | 'white' | 'badge'
+import React, { useEffect, useState } from 'react'
+import { useTheme } from 'next-themes'
+
+export type FitVibeLogoTheme = 'auto' | 'contrast' | 'emerald' | 'darkgreen' | 'black' | 'white' | 'badge'
 
 interface FitVibeLogoProps extends React.SVGProps<SVGSVGElement> {
   variant?: 'full' | 'mark'
@@ -26,27 +29,42 @@ const TEXT_PATHS: string[] = [
   "M20788 3523 c-10 -2 -18 -9 -18 -14 -3 -457 2 -3133 5 -3140 9 -13 2142 -12 2150 1 11 18 5 633 -6 647 -9 10 -146 13 -703 15 l-691 3 0 285 0 285 629 3 c489 2 632 5 638 15 4 6 8 152 8 323 0 249 -3 314 -13 323 -10 8 -197 12 -638 13 l-624 3 -3 279 c-2 200 1 283 9 293 10 11 122 13 697 13 553 -1 687 1 693 12 14 22 11 622 -3 636 -9 9 -257 12 -1062 11 -578 -1 -1059 -3 -1068 -6z"
 ]
 
-const THEME_COLORS: Record<FitVibeLogoTheme, { figure: string; text: string }> = {
+const THEME_COLORS: Record<Exclude<FitVibeLogoTheme, 'auto'>, { figure: string; text: string }> = {
   contrast: { figure: '#0eb880', text: '#0f172a' }, // Chuẩn tương phản cao cho nền trắng/báo cáo
   emerald: { figure: '#0eb880', text: '#0eb880' }, // Bản xanh ngọc nguyên bản
   darkgreen: { figure: '#047857', text: '#064e3b' }, // Bản xanh rừng đậm sắc nét
   black: { figure: '#000000', text: '#000000' }, // Bản đen trắng in ấn
-  white: { figure: '#10b981', text: '#ffffff' }, // Bản cho nền tối
+  white: { figure: '#00f5a0', text: '#ffffff' }, // Bản cho nền tối: Figure neon mint sáng rực + Chữ trắng
   badge: { figure: '#0eb880', text: '#0f172a' },
 }
 
 export default function FitVibeLogo({
   variant = 'full',
-  theme = 'contrast',
+  theme = 'auto',
   figureColor,
   textColor,
   color,
   className = 'h-8 w-auto',
   ...props
 }: FitVibeLogoProps) {
-  // Color resolution
-  const resolvedFigure = color || figureColor || THEME_COLORS[theme]?.figure || '#0eb880'
-  const resolvedText = color || textColor || THEME_COLORS[theme]?.text || '#0f172a'
+  // Resolve Figure and Text colors
+  // For 'auto', we utilize CSS variables so colors switch instantaneously with html.dark without hydration lag
+  const resolvedFigure =
+    color ||
+    figureColor ||
+    (theme !== 'auto'
+      ? THEME_COLORS[theme]?.figure
+      : 'var(--fitvibe-logo-figure, #00f5a0)')
+
+  const resolvedText =
+    color ||
+    textColor ||
+    (theme !== 'auto'
+      ? THEME_COLORS[theme]?.text
+      : 'var(--fitvibe-logo-text, #ffffff)')
+
+  const isExplicitWhite = theme === 'white'
+  const glowStyle = isExplicitWhite ? { filter: 'drop-shadow(0 0 12px rgba(0, 245, 160, 0.65))' } : undefined
 
   if (theme === 'badge' && variant === 'full') {
     return (
@@ -107,7 +125,9 @@ export default function FitVibeLogo({
         <g
           transform="translate(0.000000,752.000000) scale(0.100000,-0.100000)"
           fill={resolvedFigure}
+          style={glowStyle}
           stroke="none"
+          className="fitvibe-logo-glow transition-all duration-300"
         >
           {FIGURE_PATHS.map((d, i) => (
             <path key={`mark-${i}`} d={d} />
@@ -128,12 +148,16 @@ export default function FitVibeLogo({
       {...props}
     >
       <g transform="translate(0.000000,752.000000) scale(0.100000,-0.100000)" stroke="none">
-        <g fill={resolvedFigure}>
+        <g
+          fill={resolvedFigure}
+          style={glowStyle}
+          className="fitvibe-logo-glow transition-all duration-300"
+        >
           {FIGURE_PATHS.map((d, i) => (
             <path key={`full-fig-${i}`} d={d} />
           ))}
         </g>
-        <g fill={resolvedText}>
+        <g fill={resolvedText} className="transition-all duration-300">
           {TEXT_PATHS.map((d, i) => (
             <path key={`full-txt-${i}`} d={d} />
           ))}

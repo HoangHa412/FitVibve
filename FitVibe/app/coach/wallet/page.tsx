@@ -5,6 +5,33 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import { coachApi } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 
+const VIETNAMESE_BANKS = [
+    { value: 'Vietcombank', label: 'Vietcombank (VCB) - Ngoại thương Việt Nam' },
+    { value: 'Techcombank', label: 'Techcombank (TCB) - Kỹ thương Việt Nam' },
+    { value: 'MB Bank', label: 'MB Bank (MB) - Quân đội' },
+    { value: 'VPBank', label: 'VPBank (VPB) - Việt Nam Thịnh Vượng' },
+    { value: 'ACB', label: 'ACB - Á Châu' },
+    { value: 'BIDV', label: 'BIDV - Đầu tư và Phát triển Việt Nam' },
+    { value: 'VietinBank', label: 'VietinBank (CTG) - Công thương Việt Nam' },
+    { value: 'TPBank', label: 'TPBank (TPB) - Tiên Phong' },
+    { value: 'Agribank', label: 'Agribank (VBA) - Nông nghiệp & PTNT' },
+    { value: 'Sacombank', label: 'Sacombank (STB) - Sài Gòn Thương Tín' },
+    { value: 'HDBank', label: 'HDBank (HDB) - Phát triển TP.HCM' },
+    { value: 'VIB', label: 'VIB - Quốc tế Việt Nam' },
+    { value: 'SHB', label: 'SHB - Sài Gòn - Hà Nội' },
+    { value: 'MSB', label: 'MSB - Hàng Hải Việt Nam' },
+    { value: 'OCB', label: 'OCB - Phương Đông' },
+    { value: 'SeABank', label: 'SeABank (SSB) - Đông Nam Á' },
+    { value: 'LPBank', label: 'LPBank (LPB) - Lộc Phát Việt Nam' },
+    { value: 'Nam A Bank', label: 'Nam A Bank (NAB) - Nam Á' },
+    { value: 'Bac A Bank', label: 'Bac A Bank (BAB) - Bắc Á' },
+    { value: 'ABBank', label: 'ABBank (ABB) - An Bình' },
+    { value: 'Eximbank', label: 'Eximbank (EIB) - Xuất Nhập Khẩu VN' },
+    { value: 'PVcomBank', label: 'PVcomBank - Đại Chúng Việt Nam' },
+    { value: 'CAKE by VPBank', label: 'CAKE by VPBank' },
+    { value: 'Timo', label: 'Timo Digital Bank' }
+]
+
 export default function WalletPage() {
     const [balance, setBalance] = useState(0)
     const [withdrawals, setWithdrawals] = useState<any[]>([])
@@ -47,7 +74,7 @@ export default function WalletPage() {
         fetchData()
     }, [])
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value })
     }
 
@@ -136,15 +163,20 @@ export default function WalletPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Tên ngân hàng</label>
-                                        <input 
-                                            type="text" 
+                                        <select 
                                             name="bank_name"
                                             value={form.bank_name}
                                             onChange={handleChange}
                                             required
-                                            className="w-full p-2 bg-background border border-border rounded-lg text-sm"
-                                            placeholder="Vietcombank, Techcombank..."
-                                        />
+                                            className="w-full p-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+                                        >
+                                            <option value="">-- Chọn ngân hàng nhận tiền --</option>
+                                            {VIETNAMESE_BANKS.map((b) => (
+                                                <option key={b.value} value={b.value}>
+                                                    {b.label}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Số tài khoản</label>

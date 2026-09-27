@@ -74,7 +74,12 @@ const geminiChat = async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fitvibe_jwt_super_secret_key_2026');
         if (decoded && decoded.id) {
           const [rows] = await pool.query(
-            'SELECT full_name, gender, height, weight, age, activity_level, fitness_goal FROM users WHERE id = ?',
+            `SELECT u.full_name, p.gender, p.height, 
+                    COALESCE((SELECT weight FROM weight_logs WHERE user_id = u.id ORDER BY logged_at DESC, id DESC LIMIT 1), p.weight) as weight,
+                    p.age, p.goal AS fitness_goal 
+             FROM users u 
+             LEFT JOIN profiles p ON u.id = p.user_id 
+             WHERE u.id = ?`,
             [decoded.id]
           );
           if (rows && rows.length > 0) {
@@ -82,7 +87,7 @@ const geminiChat = async (req, res) => {
           }
         }
       } catch (err) {
-        // Token invalid or expired, continue with guest/clientContext
+        console.warn('⚠️ Could not extract user profile for AI context:', err.message);
       }
     }
 

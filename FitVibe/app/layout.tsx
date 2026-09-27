@@ -14,23 +14,30 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'FitVibe - Nền tảng Sức khỏe & Thể dục',
   description: 'Quản lý sức khỏe toàn diện với các công cụ theo dõi BMI, ghi nhận cân nặng và kế hoạch tập luyện cá nhân hóa',
-  generator: 'v0.app',
+  generator: 'FitVibe Platform',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: '/favicon.ico?v=2026',
+        sizes: 'any',
+      },
+      {
+        url: '/icon.svg?v=2026',
+        type: 'image/svg+xml',
+      },
+      {
+        url: '/icon-light-32x32.png?v=2026',
+        sizes: '32x32',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: '/icon-dark-32x32.png?v=2026',
+        sizes: '32x32',
         media: '(prefers-color-scheme: dark)',
       },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
     ],
-    apple: '/apple-icon.png',
+    shortcut: '/favicon.ico?v=2026',
+    apple: '/apple-icon.png?v=2026',
   },
 }
 

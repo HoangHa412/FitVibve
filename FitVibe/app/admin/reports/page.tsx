@@ -47,6 +47,8 @@ interface ReportsData {
   userGrowth: { date: string; count: number }[];
   planCompletion: { status: string; count: number }[];
   totalRevenue?: number;
+  coachEarnings?: number;
+  platformProfit?: number;
   totalWithdrawn?: number;
   withdrawalHistory?: { amount: string; status: string; created_at: string; coach_name: string }[];
 }
@@ -98,9 +100,14 @@ export default function AdminReportsPage() {
     csvRows.push("");
 
     // 2. Overview Metrics
+    const totalRev = reportsData.totalRevenue || 0;
+    const coachShare = reportsData.coachEarnings || Math.round(totalRev * 0.8);
+    const platformGain = reportsData.platformProfit || Math.round(totalRev * 0.2);
     csvRows.push("THONG KE TONG QUAN");
-    csvRows.push(`Tong doanh thu (VND),${reportsData.totalRevenue || 0}`);
-    csvRows.push(`Tong tien da rut (VND),${reportsData.totalWithdrawn || 0}`);
+    csvRows.push(`Tong doanh so noi dung GMV (VND),${totalRev}`);
+    csvRows.push(`Thu nhap HLV phan bo 80% (VND),${coachShare}`);
+    csvRows.push(`Loi nhuan nen tang FitVibe 20% (VND),${platformGain}`);
+    csvRows.push(`Tong tien HLV da rut (VND),${reportsData.totalWithdrawn || 0}`);
     csvRows.push(`Tong nguoi dung,${reportsData.users}`);
     csvRows.push(`Tong Co van (Coach),${reportsData.coaches}`);
     csvRows.push(`Bai viet da duyet,${reportsData.posts}`);
@@ -202,13 +209,29 @@ export default function AdminReportsPage() {
         {/* Financial Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {[
-            { label: 'Tổng doanh thu', value: isDataLoading ? '...' : formatCurrency(reportsData?.totalRevenue || 0), color: 'text-primary' },
-            { label: 'Đã thanh toán (HLV rút)', value: isDataLoading ? '...' : formatCurrency(reportsData?.totalWithdrawn || 0), color: 'text-destructive' },
-            { label: 'Lợi nhuận gộp', value: isDataLoading ? '...' : formatCurrency((reportsData?.totalRevenue || 0) - (reportsData?.totalWithdrawn || 0)), color: 'text-green-500' },
+            { 
+              label: 'Tổng doanh số nội dung (GMV)', 
+              value: isDataLoading ? '...' : formatCurrency(reportsData?.totalRevenue || 0), 
+              color: 'text-primary',
+              subtitle: '100% Giao dịch mua lộ trình & bài tập'
+            },
+            { 
+              label: 'Thu nhập HLV phân bổ (80%)', 
+              value: isDataLoading ? '...' : formatCurrency(reportsData?.coachEarnings || (reportsData?.totalRevenue || 0) * 0.8), 
+              color: 'text-blue-500',
+              subtitle: 'Doanh thu chia sẻ cho các Huấn luyện viên'
+            },
+            { 
+              label: 'Lợi nhuận nền tảng (20% phí sàn)', 
+              value: isDataLoading ? '...' : formatCurrency(reportsData?.platformProfit || (reportsData?.totalRevenue || 0) * 0.2), 
+              color: 'text-emerald-500',
+              subtitle: 'Doanh thu thuần giữ lại vận hành nền tảng'
+            },
           ].map((metric, idx) => (
             <Card key={idx} className="p-6 rounded-2xl bg-gradient-to-br from-card to-secondary/5 border-border">
-              <p className="text-xs text-muted-foreground mb-1">{metric.label}</p>
+              <p className="text-xs text-muted-foreground mb-1 font-medium">{metric.label}</p>
               <p className={`text-3xl font-bold ${metric.color}`}>{metric.value}</p>
+              <p className="text-[11px] text-muted-foreground mt-2">{metric.subtitle}</p>
             </Card>
           ))}
         </div>

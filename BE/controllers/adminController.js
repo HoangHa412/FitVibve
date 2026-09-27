@@ -219,6 +219,10 @@ const getReportsData = async (req, res) => {
         // 8. Financials
         const [revenueResult] = await pool.query('SELECT SUM(price_paid) as total FROM purchases');
         const [withdrawalsResult] = await pool.query('SELECT SUM(amount) as total FROM withdrawals WHERE status = "approved"');
+        const totalRevenue = parseFloat(revenueResult[0]?.total || 0);
+        const coachEarnings = Math.round(totalRevenue * 0.8);
+        const platformProfit = Math.round(totalRevenue * 0.2);
+        const totalWithdrawn = parseFloat(withdrawalsResult[0]?.total || 0);
 
         // 9. Withdrawal History
         const [withdrawalHistory] = await pool.query(`
@@ -238,8 +242,10 @@ const getReportsData = async (req, res) => {
             recentPosts,
             userGrowth,
             planCompletion,
-            totalRevenue: revenueResult[0].total || 0,
-            totalWithdrawn: withdrawalsResult[0].total || 0,
+            totalRevenue,
+            coachEarnings,
+            platformProfit,
+            totalWithdrawn,
             withdrawalHistory
         });
     } catch (error) {

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import LoginForm from '@/components/auth/LoginForm'
 import SignupForm from '@/components/auth/SignupForm'
+import FitVibeLogo from '@/components/FitVibeLogo'
 
 export default function LandingPage() {
   const [showLogin, setShowLogin] = useState(true)
@@ -18,13 +19,8 @@ export default function LandingPage() {
 
       {/* Top Navbar */}
       <header className="relative z-10 max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between animate-fade-in-down">
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-11 h-11 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25 rotate-3 group-hover:rotate-0 group-hover:scale-105 transition-all duration-300">
-            <span className="text-2xl group-hover:scale-110 transition-transform">🌿</span>
-          </div>
-          <span className="text-2xl font-black tracking-tight text-foreground group-hover:opacity-90 transition-opacity">
-            FitVibe<span className="text-primary italic">.</span>
-          </span>
+        <div className="flex items-center gap-3 group cursor-pointer transition-transform active:scale-95">
+          <FitVibeLogo className="h-10 sm:h-12 w-auto hover:opacity-90 transition-opacity" />
         </div>
         <div className="flex items-center gap-3">
           <span className="hidden sm:inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold shadow-sm backdrop-blur-md">

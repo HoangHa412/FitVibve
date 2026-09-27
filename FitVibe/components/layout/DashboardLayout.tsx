@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { API_BASE_URL } from '@/lib/api'
+import FitVibeLogo from '@/components/FitVibeLogo'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -75,12 +76,7 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
       <header className="glass sticky top-0 z-50 w-full animate-fade-in-down shadow-sm backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           <Link href={dashboardPath} className="flex items-center gap-3 group transition-transform active:scale-95">
-            <div className="w-10 h-10 bg-gradient-to-tr from-primary to-accent rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 rotate-3 group-hover:rotate-0 group-hover:scale-105 transition-all duration-300">
-              <span className="text-xl group-hover:scale-110 transition-transform">🌿</span>
-            </div>
-            <h1 className="text-xl font-extrabold tracking-tight text-foreground bg-clip-text">
-              FitVibe<span className="text-primary italic">.</span>
-            </h1>
+            <FitVibeLogo className="h-8 md:h-9 w-auto hover:opacity-90 transition-opacity" />
           </Link>
 
           <div className="flex items-center gap-4 sm:gap-6">

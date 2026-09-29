@@ -66,34 +66,68 @@ export default function AIChatBubble() {
     setInput('');
     setIsLoading(true);
 
+    const history = messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    const userContext = user ? {
+      name: user.name,
+      role: user.role,
+    } : undefined;
+
+    let streamedAny = false;
     try {
-      const history = messages.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      }));
-
-      const userContext = user ? {
-        name: user.name,
-        role: user.role,
-      } : undefined;
-
-      const response = await aiApi.chat(userMessage.content, history, userContext);
-      
-      if (response.success) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: response.reply,
-            timestamp: new Date(),
-          },
-        ]);
-      } else {
-        toast.error('Có lỗi xảy ra khi kết nối với AI');
+      try {
+        await aiApi.chatStream(userMessage.content, history, userContext, (chunk) => {
+          if (!streamedAny) {
+            streamedAny = true;
+            setIsLoading(false);
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: chunk,
+                timestamp: new Date(),
+              }
+            ]);
+          } else {
+            setMessages((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              if (last && last.role === 'assistant') {
+                updated[updated.length - 1] = {
+                  ...last,
+                  content: last.content + chunk,
+                };
+              }
+              return updated;
+            });
+          }
+        });
+      } catch (streamErr) {
+        // Fall back to standard fast POST if streaming encounters issue
+        if (!streamedAny) {
+          const response = await aiApi.chat(userMessage.content, history, userContext);
+          if (response.success) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: response.reply,
+                timestamp: new Date(),
+              },
+            ]);
+          } else {
+            toast.error('Có lỗi xảy ra khi kết nối với AI');
+          }
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);
-      toast.error('Không thể kết nối với máy chủ AI');
+      if (!streamedAny) {
+        toast.error('Không thể kết nối với máy chủ AI');
+      }
     } finally {
       setIsLoading(false);
     }

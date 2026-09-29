@@ -130,9 +130,9 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
         </div>
       </header>
 
-      <div className="flex max-w-[1400px] mx-auto min-h-[calc(100vh-64px)] relative z-10">
+      <div className="flex max-w-[1440px] mx-auto min-h-[calc(100vh-64px)] relative z-10">
         {/* Sidebar - Modern & Sleek */}
-        <aside className="w-72 hidden lg:block sticky top-16 h-[calc(100vh-64px)] p-6 border-r border-border/50">
+        <aside className="w-64 hidden lg:block sticky top-16 h-[calc(100vh-64px)] p-5 border-r border-border/50">
           <div className="space-y-1.5 animate-fade-in-up">
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 ml-4 opacity-50">Menu</p>
             {navItems.map((item, idx) => {
@@ -160,7 +160,7 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
             })}
           </div>
 
-          <div className="absolute bottom-10 left-6 right-6 p-6 rounded-3xl bg-gradient-to-br from-primary/10 via-teal-500/10 to-accent/10 border border-primary/20 shimmer-badge shadow-sm">
+          <div className="absolute bottom-10 left-5 right-5 p-5 rounded-3xl bg-gradient-to-br from-primary/10 via-teal-500/10 to-accent/10 border border-primary/20 shimmer-badge shadow-sm">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-sm">💎</span>
               <h5 className="font-black text-sm text-foreground">FitVibe Pro</h5>
@@ -173,8 +173,8 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-6 lg:p-10 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          <div className="max-w-5xl mx-auto">
+        <main className="flex-1 min-w-0 p-4 lg:p-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <div className="w-full max-w-6xl mx-auto">
             {children}
           </div>
         </main>

@@ -430,8 +430,50 @@ export const aiApi = {
             headers: authHeaders(),
             body: JSON.stringify({ message, history, userContext }),
         }),
+    chatStream: async (
+        message: string,
+        history?: { role: string; content: string }[],
+        userContext?: any,
+        onChunk?: (chunk: string) => void
+    ): Promise<{ success: boolean; reply: string }> => {
+        const res = await fetch(`${API_BASE_URL}/api/ai/chat/stream`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ message, history, userContext }),
+        });
+
+        if (!res.ok || !res.body) {
+            throw new Error('Stream connection failed');
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullReply = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const text = decoder.decode(value, { stream: true });
+            const lines = text.split('\n');
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    try {
+                        const json = JSON.parse(line.slice(6));
+                        if (json.chunk) {
+                            fullReply += json.chunk;
+                            onChunk?.(json.chunk);
+                        }
+                    } catch (e) {
+                        // ignore malformed
+                    }
+                }
+            }
+        }
+
+        return { success: true, reply: fullReply };
+    },
     getRecommendation: (profileData: any) =>
-        request<{ success: boolean; recommendation: string }>('/api/ai/recommendation', {
+        request<{ success: boolean; recommendation: string; matchedRoutes?: any[] }>('/api/ai/recommendation', {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify(profileData),

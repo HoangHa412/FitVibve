@@ -303,12 +303,12 @@ export default function CoachContentPage() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-secondary/20 border-b border-border text-left">
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Bài tập/Bài viết</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Danh mục</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Trạng thái</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Ngày tạo</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Giá</th>
-                  <th className="px-6 py-4 text-right"></th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Bài tập/Bài viết</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Danh mục</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Trạng thái</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Ngày tạo</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Giá</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -317,25 +317,29 @@ export default function CoachContentPage() {
                     <td className="px-6 py-4 capitalize font-semibold text-foreground">
                       {post.title}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="bg-secondary px-2 py-1 rounded text-xs">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center justify-center whitespace-nowrap bg-secondary/60 text-secondary-foreground border border-border/50 px-2.5 py-1 rounded-full text-xs font-medium">
                         {getCategoryName(post.category_id)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-bold ${post.status === 'approved' ? 'bg-accent/10 text-accent' :
-                        post.status === 'pending' ? 'bg-yellow-500/10 text-yellow-600' : 'bg-destructive/10 text-destructive'
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold ${
+                        post.status === 'approved' 
+                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' 
+                          : post.status === 'pending' 
+                            ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25' 
+                            : 'bg-rose-500/15 text-rose-400 border border-rose-500/25'
                         }`}>
                         {post.status === 'approved' ? '✓ Đã duyệt' : post.status === 'pending' ? '◷ Chờ duyệt' : '✕ Từ chối'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                    <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
                       {new Date(post.created_at).toLocaleDateString('vi-VN')}
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-foreground">
+                    <td className="px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">
                       {post.price > 0 ? `${Math.floor(post.price).toLocaleString('vi-VN')}đ` : <span className="text-green-500">Free</span>}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="ghost"

@@ -77,11 +77,11 @@ export default function AdminMembersPage() {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-destructive/20 text-destructive'
+        return 'bg-purple-500/15 text-purple-400 border border-purple-500/25'
       case 'coach':
-        return 'bg-primary/20 text-primary'
+        return 'bg-blue-500/15 text-blue-400 border border-blue-500/25'
       default:
-        return 'bg-accent/20 text-accent'
+        return 'bg-teal-500/15 text-teal-400 border border-teal-500/25'
     }
   }
 
@@ -163,51 +163,52 @@ export default function AdminMembersPage() {
         {/* Members Table */}
         <Card className="rounded-2xl bg-card border-border overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border bg-secondary/20">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground">Tên</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground">Vai trò</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground">Trạng thái</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground">Tham gia</th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-muted-foreground">Hành động</th>
+                <tr className="border-b border-border bg-secondary/20 text-xs">
+                  <th className="px-4 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap">Tên</th>
+                  <th className="px-4 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap">Email</th>
+                  <th className="px-2 py-3 text-center font-semibold text-muted-foreground whitespace-nowrap">Vai trò</th>
+                  <th className="px-2 py-3 text-center font-semibold text-muted-foreground whitespace-nowrap">Trạng thái</th>
+                  <th className="px-3 py-3 text-center font-semibold text-muted-foreground whitespace-nowrap">Tham gia</th>
+                  <th className="px-4 py-3 text-right font-semibold text-muted-foreground whitespace-nowrap">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredMembers.map((member: Member) => (
                   <tr key={member.id} className="border-b border-border hover:bg-secondary/10 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-2.5 whitespace-nowrap">
                       <p className="font-medium text-foreground text-sm">{member.full_name}</p>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm text-muted-foreground">{member.email}</p>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
+                      <p className="text-xs text-muted-foreground">{member.email}</p>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${getRoleColor(member.role)}`}>
+                    <td className="px-2 py-2.5 text-center whitespace-nowrap">
+                      <span className={`inline-flex items-center justify-center whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs font-semibold ${getRoleColor(member.role)}`}>
                         {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${member.status === 'active'
-                        ? 'bg-accent/20 text-accent'
-                        : member.status === 'pending'
-                          ? 'bg-yellow-500/20 text-yellow-600'
-                          : 'bg-destructive/20 text-destructive'
+                    <td className="px-2 py-2.5 text-center whitespace-nowrap">
+                      <span className={`inline-flex items-center justify-center whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        member.status === 'active'
+                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'
+                          : member.status === 'pending'
+                            ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25'
+                            : 'bg-rose-500/15 text-rose-400 border border-rose-500/25'
                         }`}>
                         {member.status === 'active' ? 'Hoạt động' : member.status === 'pending' ? 'Chờ duyệt' : 'Đã khóa'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">{new Date(member.created_at).toLocaleDateString('vi-VN')}</td>
-                    <td className="px-6 py-4 text-right space-x-2">
+                    <td className="px-3 py-2.5 text-center text-xs text-muted-foreground whitespace-nowrap">{new Date(member.created_at).toLocaleDateString('vi-VN')}</td>
+                    <td className="px-4 py-2.5 text-right space-x-1.5 whitespace-nowrap">
                       {member.status === 'pending' && member.role === 'coach' && (
-                        <button onClick={() => handleUpdateStatus(member.id, 'active')} className="text-primary hover:text-accent text-xs font-semibold transition-colors">Duyệt</button>
+                        <button onClick={() => handleUpdateStatus(member.id, 'active')} className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-xs font-semibold transition-colors">Duyệt</button>
                       )}
                       {member.role !== 'admin' && member.status !== 'locked' && (
-                        <button onClick={() => handleUpdateStatus(member.id, 'locked')} className="text-destructive hover:text-destructive/80 text-xs font-semibold transition-colors">Khóa</button>
+                        <button onClick={() => handleUpdateStatus(member.id, 'locked')} className="px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs font-semibold transition-colors">Khóa</button>
                       )}
                       {member.role !== 'admin' && member.status === 'locked' && (
-                        <button onClick={() => handleUpdateStatus(member.id, 'active')} className="text-primary hover:text-primary/80 text-xs font-semibold transition-colors">Mở Khóa</button>
+                        <button onClick={() => handleUpdateStatus(member.id, 'active')} className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-xs font-semibold transition-colors">Mở Khóa</button>
                       )}
                       {member.role !== 'admin' && (
                         <>
@@ -228,7 +229,7 @@ export default function AdminMembersPage() {
                             } catch (error) {
                               alert('Lỗi kết nối server');
                             }
-                          }} className="text-accent hover:text-accent/80 text-xs font-semibold transition-colors">Reset MK</button>
+                          }} className="px-2.5 py-1 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 text-xs font-semibold transition-colors">Reset MK</button>
 
                           <button onClick={async () => {
                             if (!confirm('Bạn có chắc muốn xóa thành viên này không?')) return;
@@ -237,7 +238,7 @@ export default function AdminMembersPage() {
                               method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
                             });
                             if (res.ok) setMembers((prev: Member[]) => prev.filter((m) => m.id !== member.id));
-                          }} className="text-muted-foreground hover:text-destructive text-xs font-semibold transition-colors">Xóa</button>
+                          }} className="px-2.5 py-1 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 text-xs font-semibold transition-colors">Xóa</button>
                         </>
                       )}
                     </td>

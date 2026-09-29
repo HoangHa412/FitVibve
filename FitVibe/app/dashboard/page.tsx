@@ -10,7 +10,7 @@ import { userApi, aiApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { OnboardingModal } from '@/components/OnboardingModal'
 import { RecommendationModal } from '@/components/RecommendationModal'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Sparkles } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -42,6 +42,7 @@ export default function UserDashboard() {
   }, [user, authLoading, router])
 
   const [recommendations, setRecommendations] = useState<any[]>([])
+  const [recMatchedRoutes, setRecMatchedRoutes] = useState<any[]>([])
 
   useEffect(() => {
     if (user?.role === 'user') {
@@ -96,9 +97,13 @@ export default function UserDashboard() {
     }
     setIsGeneratingRec(true)
     try {
-      const res = await aiApi.getRecommendation(profile)
+      const res = await aiApi.getRecommendation(profile) as any
       if (res.success) {
         setRecContent(res.recommendation)
+        if (res.matchedRoutes && res.matchedRoutes.length > 0) {
+          setRecMatchedRoutes(res.matchedRoutes)
+          setRecommendations(res.matchedRoutes)
+        }
         setIsRecOpen(true)
       } else {
         toast.error('Không thể tạo lộ trình lúc này')
@@ -407,6 +412,11 @@ export default function UserDashboard() {
                       }`}>
                         {route.target_goal === 'weight_loss' ? 'Giảm cân' : route.target_goal === 'muscle_gain' ? 'Tăng cơ' : 'Thể lực'}
                       </div>
+                      {route.match_score && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 shadow-sm">
+                          <Sparkles className="w-2.5 h-2.5" /> {route.match_score}% Phù hợp
+                        </span>
+                      )}
                     </div>
                     <h4 className="text-lg font-black text-foreground mb-1 group-hover:text-accent transition-colors">{route.title}</h4>
                     <p className="text-xs text-muted-foreground mb-4">HLV: {route.coach_name}</p>
@@ -438,6 +448,7 @@ export default function UserDashboard() {
         open={isRecOpen} 
         onOpenChange={setIsRecOpen} 
         content={recContent} 
+        matchedRoutes={recMatchedRoutes}
       />
     </DashboardLayout>
   )

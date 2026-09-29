@@ -7,7 +7,6 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { API_BASE_URL } from '@/lib/api'
-import FitVibeLogo, { FitVibeLogoTheme } from '@/components/FitVibeLogo'
 import { 
   LineChart, 
   Line, 
@@ -59,7 +58,6 @@ export default function AdminReportsPage() {
   const router = useRouter()
   const [reportsData, setReportsData] = useState<ReportsData | null>(null)
   const [isDataLoading, setIsDataLoading] = useState(true)
-  const [logoPreviewBg, setLogoPreviewBg] = useState<'light' | 'dark'>('light')
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -208,157 +206,6 @@ export default function AdminReportsPage() {
           </Button>
         </div>
 
-        {/* Bộ Nhận Diện & Logo FitVibe cho Báo Cáo / Đồ Án */}
-        <Card className="p-6 rounded-2xl bg-card border-border shadow-sm mb-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-border/60">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🎨</span>
-                <h3 className="font-bold text-lg text-foreground">Bộ Nhận Diện & Logo FitVibe Cho Báo Cáo / Đồ Án</h3>
-                <span className="text-[10px] uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  Chống Chìm Nền Trắng
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Các biến thể màu sắc tối ưu độ tương phản cao — đảm bảo logo luôn nổi bật, sắc nét trên trang in Word, Slide thuyết trình hay Poster đồ án.
-              </p>
-            </div>
-
-            {/* Toggle nền xem trước */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-secondary/60 border border-border/40 text-xs">
-              <span className="text-[11px] font-semibold text-muted-foreground px-2">Xem thử:</span>
-              <button
-                type="button"
-                onClick={() => setLogoPreviewBg('light')}
-                className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                  logoPreviewBg === 'light'
-                    ? 'bg-card text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                ⚪ Nền trắng
-              </button>
-              <button
-                type="button"
-                onClick={() => setLogoPreviewBg('dark')}
-                className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                  logoPreviewBg === 'dark'
-                    ? 'bg-card text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                ⚫ Nền tối
-              </button>
-            </div>
-          </div>
-
-          {/* Grid các Theme Logo */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
-            {[
-              {
-                id: 'contrast',
-                title: 'Tương Phản Cao (Khuyên Dùng)',
-                desc: 'Icon xanh emerald + Chữ than chì đậm (#0f172a). Đọc siêu rõ trên giấy in & nền trắng.',
-                theme: 'contrast' as FitVibeLogoTheme,
-                badge: 'Khuyên Dùng Cho Word / Slide',
-                png: '/fitvibe-logo-contrast.png',
-                svg: '/fitvibe-logo-contrast.svg',
-              },
-              {
-                id: 'badge',
-                title: 'Thẻ Card Bo Góc (Card Badge)',
-                desc: 'Logo đặt trong khung thẻ trắng có viền và đổ bóng mềm, chèn vào tài liệu là nổi khối ngay.',
-                theme: 'badge' as FitVibeLogoTheme,
-                badge: 'Nổi Bật Mọi Nền',
-                png: '/fitvibe-logo-badge.png',
-                svg: '/fitvibe-logo-badge.svg',
-              },
-              {
-                id: 'darkgreen',
-                title: 'Xanh Rừng Đậm (Deep Forest)',
-                desc: 'Màu xanh rêu đậm (#047857/#064e3b) sang trọng, tạo cảm giác chuyên nghiệp trên báo cáo.',
-                theme: 'darkgreen' as FitVibeLogoTheme,
-                badge: 'Sang Trọng',
-                png: '/fitvibe-logo-darkgreen.png',
-                svg: '/fitvibe-logo-darkgreen.svg',
-              },
-              {
-                id: 'black',
-                title: 'Đen Trắng Thuần (Monochrome)',
-                desc: 'Toàn bộ màu đen 100% (#000000) phục vụ in ấn photo hoặc văn bản đồ án tiêu chuẩn.',
-                theme: 'black' as FitVibeLogoTheme,
-                badge: 'In Ấn Tiêu Chuẩn',
-                png: '/fitvibe-logo-black.png',
-                svg: '/fitvibe-logo-black.svg',
-              },
-              {
-                id: 'emerald',
-                title: 'Xanh Ngọc Thương Hiệu (Brand Emerald)',
-                desc: 'Toàn bộ logo sắc xanh ngọc nguyên bản (#0eb880) đặc trưng nhận diện của FitVibe.',
-                theme: 'emerald' as FitVibeLogoTheme,
-                badge: 'Màu Nhận Diện Gốc',
-                png: '/fitvibe-logo.png',
-                svg: '/fitvibe-logo.svg',
-              },
-              {
-                id: 'white',
-                title: 'Bản Nền Tối (White on Dark)',
-                desc: 'Biểu tượng xanh + Chữ trắng tinh khôi (#ffffff), hoàn hảo cho Slide và màn hình tối.',
-                theme: 'white' as FitVibeLogoTheme,
-                badge: 'Dành Cho Slide Tối',
-                png: '/fitvibe-logo-white.png',
-                svg: '/fitvibe-logo-white.svg',
-              },
-            ].map((variant) => (
-              <div
-                key={variant.id}
-                className="p-4 rounded-xl border border-border/80 bg-secondary/15 flex flex-col justify-between hover:border-primary/40 hover:shadow-sm transition-all"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-primary/10">
-                      {variant.badge}
-                    </span>
-                  </div>
-                  {/* Canvas hiển thị logo */}
-                  <div
-                    className={`h-24 rounded-lg flex items-center justify-center p-3 mb-3 border transition-colors ${
-                      logoPreviewBg === 'dark'
-                        ? 'bg-slate-950 border-slate-800'
-                        : 'bg-white border-slate-200'
-                    }`}
-                  >
-                    <FitVibeLogo
-                      theme={variant.theme}
-                      className="max-h-12 w-auto max-w-[85%]"
-                    />
-                  </div>
-                  <h4 className="font-bold text-sm text-foreground mb-1">{variant.title}</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                    {variant.desc}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 pt-2 border-t border-border/40">
-                  <a
-                    href={variant.png}
-                    download
-                    className="flex-1 text-center py-1.5 px-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-colors"
-                  >
-                    ⬇️ Tải PNG
-                  </a>
-                  <a
-                    href={variant.svg}
-                    download
-                    className="flex-1 text-center py-1.5 px-2 rounded-lg bg-secondary hover:bg-secondary/80 text-foreground text-xs font-bold border border-border/50 transition-colors"
-                  >
-                    ⬇️ Tải SVG
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {[
             { 

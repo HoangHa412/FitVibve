@@ -122,10 +122,12 @@ const getStats = async (req, res) => {
 const getPendingPosts = async (req, res) => {
     try {
         const query = `
-           SELECT p.*, u.full_name as author
+           SELECT p.*, u.full_name as author, c.name as category_name
            FROM posts p
            JOIN users u ON p.coach_id = u.id
+           LEFT JOIN categories c ON p.category_id = c.id
            WHERE p.status = "pending"
+           ORDER BY p.created_at DESC
        `;
         const [posts] = await pool.query(query);
         res.json(posts);

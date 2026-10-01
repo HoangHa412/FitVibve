@@ -277,9 +277,28 @@ export default function RouteDetailPage() {
                                                             ></iframe>
                                                         </div>
                                                     ) : (
-                                                        <a href={stage.submission_video_url} target="_blank" rel="noreferrer" className="text-sm text-blue-500 font-medium underline flex items-center gap-2 bg-blue-500/5 p-3 rounded-lg border border-blue-500/10 hover:bg-blue-500/10 transition-colors w-fit">
-                                                            ▶️ Xem lại video bạn đã gửi (Link ngoài)
-                                                        </a>
+                                                        <div className="w-full max-w-lg rounded-xl overflow-hidden border border-border shadow-md bg-black">
+                                                            <video
+                                                                controls
+                                                                playsInline
+                                                                preload="metadata"
+                                                                className="w-full aspect-video object-contain"
+                                                                src={stage.submission_video_url}
+                                                            />
+                                                            <div className="p-2.5 bg-muted/40 flex justify-between items-center text-xs border-t border-border/40">
+                                                                <span className="text-muted-foreground font-semibold flex items-center gap-1.5">
+                                                                    📹 <span>Video bài tập của bạn</span>
+                                                                </span>
+                                                                <a
+                                                                    href={stage.submission_video_url}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    className="text-primary hover:underline font-bold flex items-center gap-1"
+                                                                >
+                                                                    ↗ Xem toàn màn hình
+                                                                </a>
+                                                            </div>
+                                                        </div>
                                                     )}
                                                 </div>
                                             )}

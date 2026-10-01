@@ -311,11 +311,20 @@ export default function ProfilePage() {
                                 <h4 className="font-black text-xl text-destructive">Đổi mật khẩu</h4>
                             </div>
 
-                            <form onSubmit={handleChangePassword} className="space-y-6">
+                            <form onSubmit={handleChangePassword} className="space-y-6" autoComplete="off">
+                                {/* Dummy hidden fields to prevent browser autofill heuristics */}
+                                <input type="text" name="fake_username_remember" className="hidden" tabIndex={-1} aria-hidden="true" autoComplete="off" />
+                                <input type="password" name="fake_password_remember" className="hidden" tabIndex={-1} aria-hidden="true" autoComplete="new-password" />
+
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted-foreground uppercase ml-2 tracking-wider">Mật khẩu hiện tại</label>
                                     <input
                                         type="password"
+                                        id="current-password"
+                                        name="current-password"
+                                        autoComplete="new-password"
+                                        data-lpignore="true"
+                                        data-1p-ignore="true"
                                         className="w-full bg-secondary/30 border-2 border-transparent focus:border-destructive/20 focus:bg-card rounded-2xl px-5 py-3 text-sm font-medium transition-all outline-none"
                                         value={oldPassword}
                                         onChange={(e) => setOldPassword(e.target.value)}
@@ -328,6 +337,11 @@ export default function ProfilePage() {
                                         <label className="text-xs font-bold text-muted-foreground uppercase ml-2 tracking-wider">Mật khẩu mới</label>
                                         <input
                                             type="password"
+                                            id="new-password"
+                                            name="new-password"
+                                            autoComplete="new-password"
+                                            data-lpignore="true"
+                                            data-1p-ignore="true"
                                             className="w-full bg-secondary/30 border-2 border-transparent focus:border-primary/20 focus:bg-card rounded-2xl px-5 py-3 text-sm font-medium transition-all outline-none"
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
@@ -338,6 +352,11 @@ export default function ProfilePage() {
                                         <label className="text-xs font-bold text-muted-foreground uppercase ml-2 tracking-wider">Xác nhận mật khẩu mới</label>
                                         <input
                                             type="password"
+                                            id="confirm-password"
+                                            name="confirm-password"
+                                            autoComplete="new-password"
+                                            data-lpignore="true"
+                                            data-1p-ignore="true"
                                             className="w-full bg-secondary/30 border-2 border-transparent focus:border-primary/20 focus:bg-card rounded-2xl px-5 py-3 text-sm font-medium transition-all outline-none"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -350,6 +369,7 @@ export default function ProfilePage() {
                                     <Button
                                         variant="outline"
                                         disabled={isSaving}
+                                        type="submit"
                                         className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest border-destructive/20 text-destructive hover:bg-destructive/5 active:scale-[0.98] transition-all"
                                     >
                                         {isSaving ? 'Đang xác thực...' : 'Cập nhật mật khẩu'}

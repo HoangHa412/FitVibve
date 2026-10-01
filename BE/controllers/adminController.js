@@ -139,8 +139,10 @@ const getPendingPosts = async (req, res) => {
 const getPendingCoaches = async (req, res) => {
     try {
         const query = `
-            SELECT u.*, GROUP_CONCAT(cc.image_url) as certificates
+            SELECT u.id, u.email, u.full_name, u.role, u.status, u.avatar_url, u.created_at,
+                   p.bio, GROUP_CONCAT(DISTINCT cc.image_url) as certificates
             FROM users u 
+            LEFT JOIN profiles p ON u.id = p.user_id
             LEFT JOIN coach_certificates cc ON u.id = cc.coach_id 
             WHERE u.role = "coach" AND u.status = "pending"
             GROUP BY u.id
@@ -155,9 +157,14 @@ const getPendingCoaches = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
         const query = `
-            SELECT u.id, u.email, u.full_name, u.role, u.status, u.created_at, 
-                   GROUP_CONCAT(cc.image_url) as certificates
+            SELECT u.id, u.email, u.full_name, u.role, u.status, u.avatar_url, u.balance, u.created_at, 
+                   p.bio, p.age, p.gender,
+                   GROUP_CONCAT(DISTINCT cc.image_url) as certificates,
+                   (SELECT COUNT(*) FROM enrollments WHERE coach_id = u.id AND status = 'active') as active_students,
+                   (SELECT COUNT(*) FROM posts WHERE coach_id = u.id) as post_count,
+                   (SELECT COUNT(*) FROM routes WHERE coach_id = u.id) as route_count
             FROM users u 
+            LEFT JOIN profiles p ON u.id = p.user_id
             LEFT JOIN coach_certificates cc ON u.id = cc.coach_id 
             GROUP BY u.id
             ORDER BY u.created_at DESC

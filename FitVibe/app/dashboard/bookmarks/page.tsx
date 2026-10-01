@@ -252,11 +252,11 @@ function BookmarkCard({ post, onClick, isWorkout = false }: { post: any, onClick
       <div className={`absolute inset-0 bg-gradient-to-tr ${isWorkout ? 'from-primary/20 to-indigo-500/20' : 'from-accent/20 to-primary/20'} rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
       <Card className="relative overflow-hidden p-0 border-border/50 bg-card hover:border-indigo-500/30 transition-all duration-500 rounded-[2.5rem] flex flex-col h-full shadow-sm hover:shadow-2xl hover:-translate-y-2">
         <div className="p-8 pb-0">
-          <div className="flex items-center justify-between mb-6">
-            <span className={`px-4 py-1.5 rounded-full ${isWorkout ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'} text-[10px] font-black uppercase tracking-widest border border-current/10`}>
+          <div className="flex items-start justify-between gap-3.5 mb-6">
+            <span className={`px-3.5 py-1.5 rounded-xl ${isWorkout ? 'bg-primary/10 text-primary border-primary/20' : 'bg-accent/10 text-accent border-accent/20'} text-[10px] font-black uppercase tracking-wider border max-w-[calc(100%-3.5rem)] leading-snug break-words`}>
               {post.category_name}
             </span>
-            <div className={`w-10 h-10 rounded-2xl ${isWorkout ? 'bg-primary/10 group-hover:bg-primary' : 'bg-accent/10 group-hover:bg-accent'} flex items-center justify-center text-xl group-hover:text-white transition-colors`}>
+            <div className={`w-10 h-10 rounded-2xl shrink-0 ${isWorkout ? 'bg-primary/10 group-hover:bg-primary' : 'bg-accent/10 group-hover:bg-accent'} flex items-center justify-center text-xl group-hover:text-white transition-colors shadow-sm`}>
               {isWorkout ? '🏋️' : '🥗'}
             </div>
           </div>

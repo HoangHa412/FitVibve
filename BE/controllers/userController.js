@@ -428,16 +428,21 @@ const getCoaches = async (req, res) => {
 const getCoachById = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
+    const isAdmin = req.user.role === 'admin';
     try {
+        const statusCondition = isAdmin ? '' : "AND u.status = 'active'";
         const [coaches] = await pool.query(`
-            SELECT u.id, u.full_name, u.email, u.avatar_url, p.bio,
-                   GROUP_CONCAT(cc.image_url) as certificates,
-                   IF(e.user_id IS NOT NULL AND e.status = 'active', 1, 0) as is_enrolled
+            SELECT u.id, u.full_name, u.email, u.avatar_url, u.status, p.bio,
+                   GROUP_CONCAT(DISTINCT cc.image_url) as certificates,
+                   IF(e.user_id IS NOT NULL AND e.status = 'active', 1, 0) as is_enrolled,
+                   (SELECT COUNT(*) FROM enrollments WHERE coach_id = u.id AND status = 'active') as student_count,
+                   (SELECT COUNT(*) FROM routes WHERE coach_id = u.id) as route_count,
+                   (SELECT COUNT(*) FROM posts WHERE coach_id = u.id) as post_count
             FROM users u
             LEFT JOIN profiles p ON u.id = p.user_id
             LEFT JOIN coach_certificates cc ON u.id = cc.coach_id
             LEFT JOIN enrollments e ON u.id = e.coach_id AND e.user_id = ?
-            WHERE u.id = ? AND u.role = 'coach' AND u.status = 'active'
+            WHERE u.id = ? AND u.role = 'coach' ${statusCondition}
             GROUP BY u.id
         `, [userId, id]);
 

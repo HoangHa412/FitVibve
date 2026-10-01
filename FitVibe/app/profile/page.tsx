@@ -390,7 +390,17 @@ export default function ProfilePage() {
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                             {certificates.map((url, idx) => (
                                                 <div key={idx} className="relative aspect-video rounded-xl overflow-hidden border border-border group/cert">
-                                                    <img src={`${API_BASE_URL}${url}`} className="w-full h-full object-cover" alt="Certificate" />
+                                                    <img 
+                                                        src={`${API_BASE_URL}${url}`} 
+                                                        className="w-full h-full object-cover" 
+                                                        alt="Certificate"
+                                                        onError={(e) => {
+                                                            const t = e.currentTarget;
+                                                            if (!t.src.includes('/certificates/') && t.src.includes('/uploads/')) {
+                                                                t.src = t.src.replace('/uploads/', '/uploads/certificates/');
+                                                            }
+                                                        }}
+                                                    />
                                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/cert:opacity-100 transition-opacity flex items-center justify-center">
                                                         <a href={`${API_BASE_URL}${url}`} target="_blank" rel="noreferrer" className="text-white text-[10px] font-bold underline">Xem chi tiết</a>
                                                     </div>
@@ -443,11 +453,20 @@ export default function ProfilePage() {
                                 <h4 className="font-black text-xl text-destructive">Đổi mật khẩu</h4>
                             </div>
 
-                            <form onSubmit={handleChangePassword} className="space-y-6">
+                            <form onSubmit={handleChangePassword} className="space-y-6" autoComplete="off">
+                                {/* Dummy hidden fields to prevent browser autofill heuristics */}
+                                <input type="text" name="fake_username_remember" className="hidden" tabIndex={-1} aria-hidden="true" autoComplete="off" />
+                                <input type="password" name="fake_password_remember" className="hidden" tabIndex={-1} aria-hidden="true" autoComplete="new-password" />
+
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted-foreground uppercase ml-2 tracking-wider">Mật khẩu hiện tại</label>
                                     <input
                                         type="password"
+                                        id="current-password"
+                                        name="current-password"
+                                        autoComplete="new-password"
+                                        data-lpignore="true"
+                                        data-1p-ignore="true"
                                         className="w-full bg-secondary/30 border-2 border-transparent focus:border-destructive/20 focus:bg-card rounded-2xl px-5 py-3 text-sm font-medium transition-all outline-none"
                                         value={oldPassword}
                                         onChange={(e) => setOldPassword(e.target.value)}
@@ -460,6 +479,11 @@ export default function ProfilePage() {
                                         <label className="text-xs font-bold text-muted-foreground uppercase ml-2 tracking-wider">Mật khẩu mới</label>
                                         <input
                                             type="password"
+                                            id="new-password"
+                                            name="new-password"
+                                            autoComplete="new-password"
+                                            data-lpignore="true"
+                                            data-1p-ignore="true"
                                             className="w-full bg-secondary/30 border-2 border-transparent focus:border-primary/20 focus:bg-card rounded-2xl px-5 py-3 text-sm font-medium transition-all outline-none"
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
@@ -470,6 +494,11 @@ export default function ProfilePage() {
                                         <label className="text-xs font-bold text-muted-foreground uppercase ml-2 tracking-wider">Xác nhận mật khẩu mới</label>
                                         <input
                                             type="password"
+                                            id="confirm-password"
+                                            name="confirm-password"
+                                            autoComplete="new-password"
+                                            data-lpignore="true"
+                                            data-1p-ignore="true"
                                             className="w-full bg-secondary/30 border-2 border-transparent focus:border-primary/20 focus:bg-card rounded-2xl px-5 py-3 text-sm font-medium transition-all outline-none"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}

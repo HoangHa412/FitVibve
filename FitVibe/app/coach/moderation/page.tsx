@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 import { coachApi } from '@/lib/api'
 import { toast } from 'sonner'
@@ -15,6 +16,7 @@ export default function CoachModerationPage() {
   const router = useRouter()
   const [items, setItems] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [previewItem, setPreviewItem] = useState<any | null>(null)
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== 'coach')) {
@@ -168,9 +170,28 @@ export default function CoachModerationPage() {
                             ></iframe>
                           </div>
                         ) : (
-                          <a href={item.submission_video_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-primary font-bold bg-primary/5 p-4 rounded-xl border border-primary/10 hover:bg-primary/10 transition-all">
-                            🔗 Xem video bài tập học viên nộp
-                          </a>
+                          <div className="rounded-xl overflow-hidden border border-border shadow-2xl bg-black w-full">
+                            <video
+                              controls
+                              playsInline
+                              preload="metadata"
+                              className="w-full aspect-video object-contain"
+                              src={item.submission_video_url}
+                            />
+                            <div className="p-2.5 bg-secondary/30 flex justify-between items-center text-xs border-t border-border/40">
+                              <span className="text-muted-foreground font-semibold flex items-center gap-1.5">
+                                📹 <span>Video học viên thực hiện bài tập</span>
+                              </span>
+                              <a
+                                href={item.submission_video_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-primary hover:underline font-bold flex items-center gap-1"
+                              >
+                                ↗ Xem toàn màn hình
+                              </a>
+                            </div>
+                          </div>
                         )}
                         <p className="text-[10px] text-muted-foreground mt-3 italic">Nộp vào: {new Date(item.submitted_at).toLocaleString('vi-VN')}</p>
                       </div>
@@ -237,14 +258,13 @@ export default function CoachModerationPage() {
                       <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
                         {item.route_title} / {item.stage_title}
                       </p>
-                      <a 
-                        href={item.submission_video_url} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="text-[10px] text-primary hover:underline block mt-1"
+                      <button 
+                        type="button"
+                        onClick={() => setPreviewItem(item)}
+                        className="text-[11px] text-primary font-bold hover:underline flex items-center gap-1 mt-1 cursor-pointer"
                       >
-                        🔗 Xem video học viên nộp
-                      </a>
+                        🎥 Xem video học viên nộp
+                      </button>
                     </div>
                   </div>
                   
@@ -269,6 +289,47 @@ export default function CoachModerationPage() {
             )}
           </div>
         </div>
+
+        {/* Video Preview Modal */}
+        <Dialog open={!!previewItem} onOpenChange={(open: boolean) => !open && setPreviewItem(null)}>
+          <DialogContent className="max-w-2xl bg-card border-border p-6">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <span>📹</span> Video bài tập: {previewItem?.user_name} - {previewItem?.stage_title}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              {previewItem?.submission_video_url && (
+                getYouTubeEmbedUrl(previewItem.submission_video_url) ? (
+                  <div className="aspect-video rounded-xl overflow-hidden border border-border shadow-2xl bg-black w-full">
+                    <iframe
+                      width="100%" height="100%"
+                      src={getYouTubeEmbedUrl(previewItem.submission_video_url)!}
+                      title="Student Submission" frameBorder="0"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                ) : (
+                  <div className="rounded-xl overflow-hidden border border-border shadow-2xl bg-black w-full">
+                    <video
+                      controls
+                      autoPlay
+                      playsInline
+                      className="w-full aspect-video object-contain"
+                      src={previewItem.submission_video_url}
+                    />
+                  </div>
+                )
+              )}
+              {previewItem?.coach_feedback && (
+                <div className="mt-4 p-3 bg-secondary/30 rounded-xl border border-border/40 text-xs">
+                  <span className="font-bold text-muted-foreground block mb-1">Nhận xét:</span>
+                  <p className="italic text-foreground">"{previewItem.coach_feedback}"</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   )

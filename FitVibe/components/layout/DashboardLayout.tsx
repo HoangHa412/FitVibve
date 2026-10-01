@@ -132,8 +132,8 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
 
       <div className="flex max-w-[1440px] mx-auto min-h-[calc(100vh-64px)] relative z-10">
         {/* Sidebar - Modern & Sleek */}
-        <aside className="w-64 hidden lg:block sticky top-16 h-[calc(100vh-64px)] p-5 border-r border-border/50">
-          <div className="space-y-1.5 animate-fade-in-up">
+        <aside className="w-64 hidden lg:flex flex-col justify-between sticky top-16 h-[calc(100vh-64px)] p-5 border-r border-border/50">
+          <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 -mr-1 animate-fade-in-up pb-3">
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 ml-4 opacity-50">Menu</p>
             {navItems.map((item, idx) => {
               const isActive = pathname === item.href
@@ -160,15 +160,17 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
             })}
           </div>
 
-          <div className="absolute bottom-10 left-5 right-5 p-5 rounded-3xl bg-gradient-to-br from-primary/10 via-teal-500/10 to-accent/10 border border-primary/20 shimmer-badge shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm">💎</span>
-              <h5 className="font-black text-sm text-foreground">FitVibe Pro</h5>
+          <div className="pt-3 mt-auto shrink-0">
+            <div className="p-4 rounded-3xl bg-gradient-to-br from-primary/10 via-teal-500/10 to-accent/10 border border-primary/20 shimmer-badge shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm">💎</span>
+                <h5 className="font-black text-sm text-foreground">FitVibe Pro</h5>
+              </div>
+              <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">Mở khóa toàn bộ bài tập & thực đơn VIP</p>
+              <button className="w-full py-2 bg-foreground text-background text-[10px] font-black uppercase tracking-wider rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-sm">
+                Nâng cấp ngay
+              </button>
             </div>
-            <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">Mở khóa toàn bộ bài tập & thực đơn VIP</p>
-            <button className="w-full py-2 bg-foreground text-background text-[10px] font-black uppercase tracking-wider rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-sm">
-              Nâng cấp ngay
-            </button>
           </div>
         </aside>
 

@@ -193,6 +193,12 @@ export default function AdminDashboard() {
                             src={`${API_BASE_URL}${url}`} 
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
                             alt={`Cert ${idx + 1}`}
+                            onError={(e) => {
+                              const t = e.currentTarget;
+                              if (!t.src.includes('/certificates/') && t.src.includes('/uploads/')) {
+                                t.src = t.src.replace('/uploads/', '/uploads/certificates/');
+                              }
+                            }}
                           />
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors flex items-center justify-center">
                             <span className="text-[10px] text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">Phóng to</span>

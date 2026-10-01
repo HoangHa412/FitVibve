@@ -82,16 +82,18 @@ export default function RoutesPage() {
                             style={{ animationDelay: `${idx * 0.08}s` }}
                         >
                             <div className="p-8 flex-grow">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                                        Lộ trình dài hạn
-                                    </span>
-                                    {route.standard && route.standard !== 'Chưa xác định' && (
-                                        <span className="px-2.5 py-1 rounded-full bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 text-[10px] font-black uppercase flex items-center gap-1 shadow-sm">
-                                            🏅 Chuẩn {route.standard}
+                                <div className="flex items-start justify-between gap-3 mb-4">
+                                    <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+                                        <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shrink-0">
+                                            Lộ trình dài hạn
                                         </span>
-                                    )}
-                                    <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 ml-auto shadow-sm">
+                                        {route.standard && route.standard !== 'Chưa xác định' && (
+                                            <span className="px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase inline-flex items-center gap-1 shadow-sm border border-amber-500/20 max-w-full truncate">
+                                                🏅 Chuẩn {route.standard}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shrink-0 shadow-sm">
                                         🏁
                                     </div>
                                 </div>

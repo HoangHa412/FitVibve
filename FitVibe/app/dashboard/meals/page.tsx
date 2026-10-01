@@ -163,11 +163,11 @@ export default function MealsPage() {
               <div className="absolute inset-0 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <Card className="relative overflow-hidden p-0 border-border/50 bg-card hover:border-accent/40 transition-all duration-300 rounded-[2.5rem] flex flex-col h-full shadow-sm hover:shadow-2xl hover:-translate-y-2">
                 <div className="p-8 pb-0">
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="px-4 py-1.5 rounded-full bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest border border-accent/10 group-hover:border-accent/30 transition-colors">
+                  <div className="flex items-start justify-between gap-3 mb-6">
+                    <span className="px-3.5 py-1.5 rounded-xl bg-accent/10 text-accent text-[10px] font-black uppercase tracking-wider border border-accent/10 group-hover:border-accent/30 transition-colors max-w-[calc(100%-3.5rem)] leading-snug break-words">
                       {post.category_name}
                     </span>
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-end gap-1 shrink-0">
                       <div className="w-10 h-10 rounded-2xl bg-accent/10 flex items-center justify-center text-xl group-hover:bg-accent group-hover:text-white group-hover:scale-110 transition-all duration-300 shadow-sm">
                         {post.price > 0 && !post.is_owned ? '🔒' : '🥗'}
                       </div>
